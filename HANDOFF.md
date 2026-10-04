@@ -38,7 +38,12 @@ Started 2026-10-04. Read `CLAUDE.md` (rules and settled decisions) first, then t
 7. `examples/robot_loop.py` has stub robot I/O; it has not been run against a real robot.
 8. **Jetson images** (Orin/JetPack 6, Thor/JetPack 7): need an L4T PyTorch base per JetPack and a
    device to test on. Image not pushed to any registry.
-9. Not git-initialised.
+9. Not git-initialised; no GitHub remote. The docs site (`website/`, workflow in
+   `.github/workflows/docs.yml`) builds with `mkdocs build --strict` but is not published: it needs
+   the repository on GitHub (assumed `mtbui2010/vla-serve`; change `site_url`/`repo_url` in
+   `website/mkdocs.yml` otherwise) and Pages set to "GitHub Actions".
+10. Docs figures come from data recorded 2026-10-05 (`website/tools/README.md`). Re-record them
+   if the served models or the executor change.
 
 Docker on this host: data-root stays on the SSD (`/var/lib/docker`). `/data` was considered and
 rejected: it is an HDD (WD Ultrastar, ROTA=1) shared with the `ketiserver` account. Old images

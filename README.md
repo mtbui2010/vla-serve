@@ -77,6 +77,23 @@ pytest                                            # fast, no GPU
 HF_HOME=/mnt/nas/huggingface HF_HUB_OFFLINE=1 CUDA_VISIBLE_DEVICES=3 pytest -m gpu -s
 ```
 
+## Documentation
+
+`website/` is a MkDocs Material site (guides, how it works, code map, API reference, and an
+8-chapter **Learn VLAs** course illustrated with figures from real runs). Preview locally:
+
+```bash
+pip install -r website/requirements.txt && mkdocs serve -f website/mkdocs.yml
+```
+
+`.github/workflows/docs.yml` publishes it to GitHub Pages on every push to `main` that touches
+`website/` (repository Settings → Pages → Source: "GitHub Actions"). Figures are regenerated from
+recorded data with `website/tools/` (see its README).
+
+## Makefile
+
+`make help` lists every command: setup, inspect/check, serve, container, tests, simulation.
+
 ## Status
 
 See `HANDOFF.md`.

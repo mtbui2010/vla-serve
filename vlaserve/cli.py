@@ -91,7 +91,8 @@ def cmd_bench(args) -> int:
         print(f"licence: {r.license.warning}", file=sys.stderr)
     t0 = time.perf_counter()
     backend = load_backend(r.entry.backend, r.path, args.device, r.entry.options)
-    print(f"loaded in {time.perf_counter() - t0:.1f}s on {args.device}")
+    load_s = time.perf_counter() - t0
+    print(f"loaded in {load_s:.1f}s on {args.device}", file=sys.stderr)   # stdout stays pure JSON
     spec = backend.spec
     rng = np.random.default_rng(0)
     obs = Observation(
@@ -103,7 +104,7 @@ def cmd_bench(args) -> int:
     for _ in range(args.warmup):
         backend.predict(obs, seed=0)
     rows = [backend.predict(obs, seed=0).timings_ms for _ in range(args.n)]
-    out = {"model": args.model, "device": args.device, "n": args.n,
+    out = {"model": args.model, "device": args.device, "n": args.n, "load_s": round(load_s, 1),
            "chunk_shape": list(backend.predict(obs, seed=0).actions.shape)}
     for k in rows[0]:
         v = np.array([r[k] for r in rows])

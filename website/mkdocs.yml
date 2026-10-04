@@ -1,0 +1,95 @@
+site_name: vla-serve
+site_description: Serve trained Vision-Language-Action robot policies locally with one command, and learn how VLAs work along the way.
+# Assumed repository location (same account as VisionServe). Change both lines if it lives elsewhere.
+site_url: https://mtbui2010.github.io/vla-serve/
+repo_url: https://github.com/mtbui2010/vla-serve
+repo_name: mtbui2010/vla-serve
+edit_uri: edit/main/website/docs/
+copyright: vla-serve is Apache-2.0. Model weights carry their own licences (see each model).
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - navigation.indexes
+    - content.code.copy
+    - content.code.annotate
+    - search.suggest
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - footnotes
+  - def_list
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+extra_css:
+  - assets/extra.css
+extra_javascript:
+  - assets/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Guides:
+      - guides/index.md
+      - Run it in a container: guides/container.md
+      - Drive a robot: guides/robot.md
+      - Test in simulation: guides/simulation.md
+      - Models, aliases and licences: guides/models.md
+  - How it works:
+      - how-it-works/index.md
+      - Code map: how-it-works/code-map.md
+      - Proving it is correct: how-it-works/correctness.md
+  - Learn VLAs:
+      - learn/index.md
+      - 1. What a VLA is: learn/01-what-is-a-vla.md
+      - 2. Actions and action chunks: learn/02-actions-and-chunks.md
+      - 3. How the action head works: learn/03-action-heads.md
+      - 4. Normalisation and statistics: learn/04-normalisation.md
+      - 5. Anatomy of a LeRobot checkpoint: learn/05-checkpoints.md
+      - 6. Real-time control: learn/06-real-time.md
+      - 7. Evaluating a policy: learn/07-evaluation.md
+      - 8. Deploying to hardware: learn/08-deployment.md
+  - Reference:
+      - HTTP API: reference/api.md
+      - Command line and Makefile: reference/cli.md
+      - Registry and robot profiles: reference/files.md

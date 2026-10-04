@@ -1,0 +1,99 @@
+# 6. Real-time control
+
+!!! abstract "In this chapter"
+    - Why a 300 ms model can still drive a 30 Hz robot.
+    - The executor's queue, and why stale actions must be dropped.
+    - A real timeline recorded against a live server.
+
+## The mismatch
+
+A 30 Hz robot needs a new action every 33 ms. One chunk takes a few hundred milliseconds:
+
+![Inference time per chunk](../assets/img/latency.png)
+
+Calling the policy at every step is impossible. Chunks make it possible: one call yields 30–50
+actions, i.e. one to two seconds of motion.
+
+## Two ways to execute chunks
+
+**Synchronous** — stop, think, act: request a chunk, play all of it, stop, request the next.
+Simple, and exactly what simulators do (physics is paused while the model thinks). On a real
+robot the arm freezes for the inference time at every chunk boundary.
+
+**Asynchronous** — keep moving while thinking: request the next chunk *while* the current one
+is still playing. This is what `ChunkExecutor` does.
+
+```mermaid
+sequenceDiagram
+  participant R as robot loop (30 Hz)
+  participant Q as action queue
+  participant S as server
+  R->>S: observation (executed = 0)
+  Note over R: waiting for the first chunk
+  S-->>Q: chunk A (30 actions)
+  loop every 33 ms
+    Q->>R: next action
+  end
+  Note over Q: 15 actions left → refill
+  R->>S: observation (executed = 15)
+  Q->>R: actions keep playing meanwhile
+  S-->>Q: chunk B arrives after 11 more actions were executed
+  Note over Q: drop B's first 11 (already in the past), replace the rest of A
+```
+
+## Stale actions
+
+Chunk B was planned from an observation taken when 15 actions had been executed. By the time it
+arrives, 11 more have run. B's first 11 actions describe moves the robot has **already made** —
+replaying them would jerk it backwards. So they are dropped:
+
+\[
+\text{drop} = \text{executed}_{\text{now}} - \text{executed}_{\text{at observation}}
+\]
+
+Counting **executed actions**, not clock ticks, matters. While the robot stands still (waiting for
+the very first chunk), time passes but the robot does not move, so the observation is still
+current. An earlier version of `ActionQueue` counted ticks and threw away the whole first chunk
+after a slow warm-up; the end-to-end test caught it.
+
+![A real ChunkExecutor timeline](../assets/img/executor-timeline.png)
+
+!!! measured "Measured — the run above"
+    SmolVLA on the server, stub robot at 30 Hz for 4 s, 30 actions per chunk, refill at 15:
+    120 ticks (10 waiting for the first chunk, then 110 actions sent), **0 stalls**, 7 chunks, 66 stale actions dropped (≈ 11 per chunk ≈
+    0.37 s round trip × 30 Hz).
+
+!!! code "Where in the code"
+    [`client.py`](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/client.py):
+    `ActionQueue.on_chunk` (pure logic, unit-tested without clocks) and `ChunkExecutor.run`
+    (two threads: the fixed-rate control loop and the inference requester).
+
+## Choosing the two knobs
+
+* **`refill_at`** (when to ask): must be larger than *latency × fps* or the queue runs dry. At
+  0.37 s and 30 Hz that is 11; the default, half a 30-step chunk, is 15.
+* **`execute_steps`** (how much of each chunk to use): smaller is more reactive and costs more
+  calls.
+
+## Smoother switching
+
+The executor's rule is *latest chunk wins*: the new chunk replaces what is left of the old one.
+At the switch the target can jump a little, because the two chunks were sampled from different
+noise ([chapter 3](03-action-heads.md)). Two known refinements:
+
+* **Temporal ensembling** (ACT, [Zhao et al., 2023](https://arxiv.org/abs/2304.13705)) averages
+  all chunks' predictions for the same time step.
+* **Real-time chunking** ([Black et al., 2025](https://arxiv.org/abs/2506.07339)) makes the new
+  chunk agree with the actions still queued, by guiding the flow-matching sampler. LeRobot ships
+  an implementation in `policies/rtc/`.
+
+Either would replace one function, `ActionQueue.on_chunk`.
+
+## What this means when you deploy
+
+* Measure round-trip time on the real network, then set `refill_at` above latency × fps.
+* `RunStats.stalls` should be 0. If it is not, the robot is pausing.
+* Raw camera frames are large (two 480×848 frames ≈ 2.4 MB per request). On WiFi, transfer time
+  adds to latency; compressed transport is on the roadmap.
+
+**Next:** [Evaluating a policy →](07-evaluation.md)
