@@ -1,0 +1,42 @@
+[project]
+name = "vla-serve"
+version = "0.1.0"
+description = "Serve trained Vision-Language-Action policies locally with one command."
+requires-python = ">=3.10"  # client; [server] needs 3.12 (LeRobot 0.6.1 requires it)
+license = "Apache-2.0"
+# The base install is the robot-side client: no torch, no LeRobot, a few MB. It covers
+# PolicyClient, ChunkExecutor, robot profiles and `vla-serve inspect/check/list`.
+# The GPU side is `[server]`, or the container image (deploy/Dockerfile).
+dependencies = [
+    "numpy",
+    "msgpack",
+    "httpx",
+    "pyyaml",
+    "huggingface_hub",
+]
+
+[project.optional-dependencies]
+server = [
+    "lerobot[pi,smolvla]==0.6.1",
+    "fastapi",
+    "uvicorn[standard]",
+]
+onnx = ["onnxruntime-gpu"]
+test = ["pytest", "lerobot[async]==0.6.1"]  # async: the LeRobot policy server used as parity reference
+
+[project.scripts]
+vla-serve = "vlaserve.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["vlaserve*"]
+
+[tool.setuptools.package-data]
+vlaserve = ["data/*.yaml", "data/profiles/*.yaml"]
+
+[tool.pytest.ini_options]
+markers = ["gpu: loads a real checkpoint on a GPU (slow; opt in with -m gpu)"]
+addopts = "-m 'not gpu'"
