@@ -24,6 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Fails early with a clear message if Pages is not set to "GitHub Actions".
+      - uses: actions/configure-pages@v5
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
