@@ -1,0 +1,7 @@
+{"rows": [
+ {"label": "Office scene · vla-serve, CPU", "sub": "same 50 scenes, 5 Oct", "k": 42, "n": 50, "served": true},
+ {"label": "Office scene · LeRobot in-process, CPU", "sub": "same 50 scenes, 5 Oct", "k": 42, "n": 50, "served": false},
+ {"label": "Office scene · vla-serve, GPU", "sub": "same 50 scenes, 5 Oct", "k": 36, "n": 50, "served": true},
+ {"label": "Plain scene · vla-serve, GPU", "sub": "single-drawer policy, 4 Oct", "k": 47, "n": 50, "served": true},
+ {"label": "Plain scene · LeRobot in-process, CPU", "sub": "same 50 scenes, 4 Oct", "k": 49, "n": 50, "served": false}],
+ "caption": "On the same device, serving changes nothing: 42/50 both ways, and the same hard scenes fail. The GPU run (36/50) is not significantly different (p = 0.11)."}

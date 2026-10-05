@@ -84,7 +84,7 @@ or right of the obstacle).
 
 !!! measured "Measured"
     kaair SmolVLA, the first observation of a real episode, eight seeds: the wrist joint's
-    target differs by up to about **0.3 rad** between seeds. With the *same* seed, the served and
+    target differs by up to about **0.5 rad** between seeds. With the *same* seed, the served and
     the in-process chunk are identical to the last bit.
 
 Consequences:

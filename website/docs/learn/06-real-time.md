@@ -37,14 +37,14 @@ sequenceDiagram
   Note over Q: 15 actions left → refill
   R->>S: observation (executed = 15)
   Q->>R: actions keep playing meanwhile
-  S-->>Q: chunk B arrives after 11 more actions were executed
-  Note over Q: drop B's first 11 (already in the past), replace the rest of A
+  S-->>Q: chunk B arrives after 8 more actions were executed
+  Note over Q: drop B's first 8 (already in the past), replace the rest of A
 ```
 
 ## Stale actions
 
 Chunk B was planned from an observation taken when 15 actions had been executed. By the time it
-arrives, 11 more have run. B's first 11 actions describe moves the robot has **already made** —
+arrives, 8 more have run. B's first 8 actions describe moves the robot has **already made** —
 replaying them would jerk it backwards. So they are dropped:
 
 \[
@@ -59,9 +59,9 @@ after a slow warm-up; the end-to-end test caught it.
 ![A real ChunkExecutor timeline](../assets/img/executor-timeline.png)
 
 !!! measured "Measured — the run above"
-    SmolVLA on the server, stub robot at 30 Hz for 4 s, 30 actions per chunk, refill at 15:
-    120 ticks (10 waiting for the first chunk, then 110 actions sent), **0 stalls**, 7 chunks, 66 stale actions dropped (≈ 11 per chunk ≈
-    0.37 s round trip × 30 Hz).
+    SmolVLA (office-scene checkpoint) on the server, stub robot at 30 Hz for 4 s, 30 actions per
+    chunk, refill at 15: 120 ticks (12 waiting for the first chunk, then 108 actions sent),
+    **0 stalls**, 6 chunks, 38 stale actions dropped (≈ 7–8 per chunk ≈ 0.24 s round trip × 30 Hz).
 
 !!! code "Where in the code"
     [`client.py`](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/client.py):
@@ -71,7 +71,8 @@ after a slow warm-up; the end-to-end test caught it.
 ## Choosing the two knobs
 
 * **`refill_at`** (when to ask): must be larger than *latency × fps* or the queue runs dry. At
-  0.37 s and 30 Hz that is 11; the default, half a 30-step chunk, is 15.
+  0.24 s and 30 Hz that is about 7; with a busier GPU (0.4 s) it is 12. The default, half a
+  30-step chunk, is 15.
 * **`execute_steps`** (how much of each chunk to use): smaller is more reactive and costs more
   calls.
 

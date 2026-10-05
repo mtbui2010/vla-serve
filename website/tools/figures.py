@@ -51,7 +51,8 @@ for ax, key, title in zip(axs, ["head0", "wrist0"], ["head camera", "wrist camer
     ax.imshow(ep[key]); ax.set_axis_off()
     h, w = ep[key].shape[:2]
     ax.set_title(f"{title}  ·  {w}×{h} RGB", loc="left")
-fig.suptitle('task: "open drawer"     state: 7 joint angles + gripper width (8 numbers)',
+TASK = str(ep["task"]) if "task" in ep.files else "open drawer"
+fig.suptitle(f'task: "{TASK}"     state: 7 joint angles + gripper width (8 numbers)',
              x=0.01, ha="left", y=0.02, fontsize=9, color=INK2)
 save(fig, "observation.png")
 
@@ -59,11 +60,11 @@ save(fig, "observation.png")
 every = int(ep["thumb_every"])
 thumbs = ep["thumbs"]
 t_succ = float(ep["t_success"])
-times = [0.0, 2.0, 4.0, 6.0, t_succ]
+times = [round(t_succ * f, 1) for f in (0, 0.25, 0.5, 0.75)] + [t_succ]
 fig, axs = plt.subplots(1, len(times), figsize=(13, 2.2))
 for ax, t in zip(axs, times):
     i = min(int(round(t * HZ / every)), len(thumbs) - 1)
-    ax.imshow(thumbs[i][:, :424]); ax.set_axis_off()
+    ax.imshow(thumbs[i][:, : thumbs.shape[2] // 2]); ax.set_axis_off()
     label = f"t = {t:.1f} s" + ("  ·  success" if t == t_succ else "")
     ax.set_title(label, fontsize=9, fontweight="normal", color=INK2, loc="left")
 save(fig, "episode-filmstrip.png")
@@ -80,7 +81,7 @@ for d, ax in enumerate(axs.flat):
 for ax in axs[1]:
     ax.set_xlabel("time [s]")
 axs[0, 0].legend(loc="upper left")
-fig.suptitle("One episode through vla-serve: 6 chunks (grey lines = a new chunk arrives), 50 actions each",
+fig.suptitle(f"One episode through vla-serve: {len(ep['chunk_steps'])} chunks (grey lines = a new chunk arrives), 50 actions each",
              x=0.01, ha="left", fontsize=10, color=INK)
 fig.tight_layout()
 save(fig, "episode-actions.png")
@@ -114,21 +115,22 @@ ax.set_title(f"Same observation, 8 random seeds: up to {spread:.2f} rad apart", 
 save(fig, "seeds.png")
 
 # 6. executor timeline ----------------------------------------------------------------------
-tl = np.load(DATA / "timeline.npz")
-req, ret, send = tl["req"], tl["ret"], tl["send"]
-fig, ax = plt.subplots(figsize=(11, 2.8))
-for (tr, _), (tt, now, at_obs) in zip(req, ret):
-    ax.barh(1, tt - tr, left=tr, height=0.5, color=BLUE)
-    stale = int(now - at_obs)
-    if stale:
-        ax.annotate(f"{stale} stale", (tt, 1.3), fontsize=7, color=INK2, ha="center")
-ax.vlines(send, -0.25, 0.25, color=ORANGE, lw=0.8)
-ax.set_yticks([0, 1], ["action sent\n(30 Hz)", "inference\nrequest"])
-ax.set_ylim(-0.6, 1.7); ax.set_xlabel("wall-clock time [s]"); ax.grid(axis="y", visible=False)
-first = send[0] if len(send) else 0
-ax.set_title(f"ChunkExecutor on a live server: {len(send)} actions, 0 stalls; first action after {first:.2f} s",
-             loc="left")
-save(fig, "executor-timeline.png")
+if (DATA / "timeline.npz").exists():
+    tl = np.load(DATA / "timeline.npz")
+    req, ret, send = tl["req"], tl["ret"], tl["send"]
+    fig, ax = plt.subplots(figsize=(11, 2.8))
+    for (tr, _), (tt, now, at_obs) in zip(req, ret):
+        ax.barh(1, tt - tr, left=tr, height=0.5, color=BLUE)
+        stale = int(now - at_obs)
+        if stale:
+            ax.annotate(f"{stale} stale", (tt, 1.3), fontsize=7, color=INK2, ha="center")
+    ax.vlines(send, -0.25, 0.25, color=ORANGE, lw=0.8)
+    ax.set_yticks([0, 1], ["action sent\n(30 Hz)", "inference\nrequest"])
+    ax.set_ylim(-0.6, 1.7); ax.set_xlabel("wall-clock time [s]"); ax.grid(axis="y", visible=False)
+    first = send[0] if len(send) else 0
+    ax.set_title(f"ChunkExecutor on a live server: {len(send)} actions, 0 stalls; first action after {first:.2f} s",
+                 loc="left")
+    save(fig, "executor-timeline.png")
 
 # 7. latency --------------------------------------------------------------------------------
 if (DATA / "latency.json").exists():
@@ -152,8 +154,9 @@ def wilson(k, n, z=1.96):
     return (c - r) / d, (c + r) / d
 
 
-rows = [("through vla-serve (2026-10-04)", 47), ("in-process LeRobot (2026-10-04)", 49), ("recorded 2026-09-24", 48)]
-fig, ax = plt.subplots(figsize=(8, 2.4))
+rows = [("office · vla-serve, CPU", 42), ("office · in-process LeRobot, CPU", 42), ("office · vla-serve, GPU", 36),
+        ("plain · vla-serve, GPU", 47), ("plain · in-process LeRobot, CPU", 49)]
+fig, ax = plt.subplots(figsize=(8, 3.4))
 for i, (name, k_) in enumerate(rows):
     lo, hi = wilson(k_, 50)
     ax.plot([100 * lo, 100 * hi], [i, i], color=AXIS, lw=3, solid_capstyle="round")
@@ -161,9 +164,9 @@ for i, (name, k_) in enumerate(rows):
     ax.annotate(f"{k_}/50", (100 * k_ / 50, i), xytext=(0, 8), textcoords="offset points", ha="center",
                 fontsize=8, color=INK2)
 ax.set_yticks(range(len(rows)), [r[0] for r in rows]); ax.invert_yaxis()
-ax.set_xlim(75, 100); ax.set_xlabel("drawers opened [%]  (bar = 95 % Wilson interval)")
+ax.set_xlim(55, 100); ax.set_xlabel("drawers opened [%]  (bar = 95 % Wilson interval)")
 ax.grid(axis="y", visible=False)
-ax.set_title("kaair_sim open-drawer, SmolVLA, same 50 scenes", loc="left")
+ax.set_title("kaair_sim open-drawer, SmolVLA: 50 identical scenes per row (4–5 Oct 2026)", loc="left")
 save(fig, "evaluation.png")
 
 # 9. normalisation --------------------------------------------------------------------------

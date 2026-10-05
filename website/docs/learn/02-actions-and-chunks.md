@@ -74,7 +74,7 @@ Executing fewer than \(H\) steps (`n_action_steps < chunk_size`) makes the robot
 at the cost of more inference calls. Executing all of them is pure open loop for that long: if
 the drawer handle slips during those 1.67 s, the policy will not notice until the next chunk.
 
-A real episode served by vla-serve: six chunks of 50 actions, each joint's commanded target
+A real episode served by vla-serve: seven chunks of 50 actions, each joint's commanded target
 (blue) and measured position (orange):
 
 ![Actions over one episode](../assets/img/episode-actions.png)

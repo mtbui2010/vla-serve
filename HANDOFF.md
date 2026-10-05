@@ -42,7 +42,7 @@ Started 2026-10-04. Read `CLAUDE.md` (rules and settled decisions) first, then t
    `.github/workflows/docs.yml`) builds with `mkdocs build --strict` but is not published: it needs
    the repository on GitHub (assumed `mtbui2010/vla-serve`; change `site_url`/`repo_url` in
    `website/mkdocs.yml` otherwise) and Pages set to "GitHub Actions".
-10. Docs figures come from data recorded 2026-10-05 (`website/tools/README.md`). Re-record them
+10. Docs figures and the tutorial video come from data recorded 2026-10-05 in kaair_sim's office scene (`website/tools/README.md`). Re-record them
    if the served models or the executor change.
 
 Docker on this host: data-root stays on the SSD (`/var/lib/docker`). `/data` was considered and
@@ -109,6 +109,14 @@ recorded run predates kaair's 2026-09-28 changes to `randomize.py`/`drawer_ready
 HTTP round trip median 273 ms (SmolVLA, raw 2 × 480x848 frames); irrelevant here because the
 sim is synchronous. Note: `kaair_sim_humble` had lost GPU access during these runs ("Failed to
 initialize NVML"), so MuJoCo rendered on CPU (~31 s/episode instead of ~9 s).
+
+**Office scene** (photo textures, `smolvla_open_drawer_real500_multidrawer_20260928` step 020000,
+`--camera-model`, 2026-10-05, same 50 scenes): vla-serve on CPU **42/50**, in-process LeRobot on
+CPU **42/50** (discordant 3/3, McNemar p = 1.0; the same five hard scenes fail in both), vla-serve
+on GPU 36/50 (vs served-CPU p = 0.11, not significant). Same noise, GPU vs CPU chunk ≤ 0.018 rad;
+different noise ≤ 0.48 rad. kaair_sim's recorded 88 % (2026-09-28) predates its `cabinet.py` change
+of 2026-09-29 and is not comparable. Open question: is the GPU run's lower rate real? Needs an
+in-process GPU baseline (restart `kaair_sim_humble` to restore its GPU) and seeded noise.
 
 This checkpoint is what forced the stats-first spec and the removal of server-side resizing.
 

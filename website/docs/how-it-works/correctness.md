@@ -41,7 +41,8 @@ Getting to zero found three real issues:
 
 Parity says "the same as LeRobot". It cannot say "the robot succeeds". That needs the policy
 acting in a world: see [Test in simulation](../guides/simulation.md). On kaair_sim's open-drawer
-task the served SmolVLA opened 47/50 drawers against 49/50 in-process, a difference within noise.
+task the served SmolVLA opened 47/50 drawers against 49/50 in-process (plain scene), and in the
+photo-textured office scene **42/50 against 42/50** with both on CPU.
 
 The closed-loop run also changed the design. That SmolVLA checkpoint's `config.json` declared the
 base model's cameras (`camera1..3`, 256×256, 6-d state) while the policy actually consumed

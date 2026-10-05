@@ -34,21 +34,38 @@ change the outcome: what you measure is the served policy alone.
 does exactly this for a MuJoCo kitchen-cabinet task with a SmolVLA policy.
 
 ```bash
-make docker-run GPU=3 CKPT_ROOT=/mnt/nas/lerobot_shared/kaair_sim/checkpoints \
-  MODEL=/ckpt/smolvla_open_drawer_500_20260924/checkpoints/020000/pretrained_model
-make kaair-eval N=50
+# office scene (photo textures, multi-drawer policy)
+CK=smolvla_open_drawer_real500_multidrawer_20260928/checkpoints/020000/pretrained_model
+make docker-run GPU=3 CKPT_ROOT=/mnt/nas/lerobot_shared/kaair_sim/checkpoints MODEL=/ckpt/$CK
+make kaair-eval KAAIR_CKPT=$CK KAAIR_TASK=task_open_drawer.yaml \
+  KAAIR_RAND=randomization_real.yaml KAAIR_EXTRA=--camera-model N=50
+
+# plain scene (single-drawer policy): the defaults
+make kaair-eval KAAIR_CKPT=smolvla_open_drawer_500_20260924/checkpoints/020000/pretrained_model
 ```
 
-!!! measured "Measured (2026-10-04)"
+Add `--device cpu` to the server (`docker run … serve --host 0.0.0.0 --device cpu <model>`) to
+compare with an in-process run on CPU, device for device.
+
+!!! measured "Measured (2026-10-04/05)"
+    ![Success rates, all runs](../assets/img/evaluation.png)
+
+    **Office scene** (textures from photos of the real room, multi-drawer SmolVLA, camera model on):
+
     | run | drawers opened |
     |---|---|
-    | through vla-serve | **47 / 50** (94 %) |
-    | in-process LeRobot, same scenes | 49 / 50 (98 %) |
+    | vla-serve, policy on **CPU** | **42 / 50** |
+    | in-process LeRobot, policy on **CPU** | **42 / 50** |
+    | vla-serve, policy on GPU | 36 / 50 |
 
-    The difference is within noise (Fisher exact p = 0.62). The hardest scene (seed 4) failed
-    **5/5** in-process when re-run alone, and 4/5 through the server: a hard scene, not a
-    serving error. Before running closed loop, served and in-process chunks were confirmed
-    identical for the same observation and seed.
+    On the same device the two are indistinguishable: 3 scenes only one of them solved, 3 only
+    the other (paired test p = 1.0), and the same five hard scenes failed in both. The GPU run is
+    lower but not significantly so against the CPU run (p = 0.11). With identical noise the GPU
+    and CPU chunks differ by at most 0.018 rad, while a different noise draw moves them by up to
+    0.48 rad, so which noise each episode happens to draw dominates.
+
+    **Plain scene** (single-drawer SmolVLA): 47/50 through vla-serve (GPU) vs 49/50 in-process
+    (CPU), p = 0.62. Its hardest scene (seed 4) failed 5/5 in-process when re-run alone.
 
 ## Read results honestly
 

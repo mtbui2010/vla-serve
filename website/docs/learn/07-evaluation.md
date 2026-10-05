@@ -52,8 +52,18 @@ Success over \(n\) episodes is a coin-flip count. Its 95 % interval (Wilson) for
 ![Success rates with 95 % intervals](../assets/img/evaluation.png)
 
 47/50 and 49/50 overlap heavily (Fisher exact test p = 0.62): **50 episodes cannot tell 94 %
-from 98 %.** To pin a rate near 95 % to ±5 points you need about 73 episodes; to compare two
-policies that differ by a few points, several hundred.
+from 98 %.** Running the *same* 50 scenes in both conditions helps: compare episode by episode
+(McNemar's test on the scenes where the two disagree).
+
+!!! measured "A worked example: is the server, or the device, to blame?"
+    Office scene, same 50 scenes. Through vla-serve on GPU: 36/50. In-process on CPU: 42/50.
+    Two things differ — the serving path *and* the device. Run vla-serve on CPU as well: 42/50,
+    with the same five hard scenes failing as in-process. The serving path is cleared; what
+    remains is device and noise, and that 36 vs 42 is itself not significant (p = 0.11).
+    Change one thing at a time.
+
+To pin a rate near 95 % to ±5 points you need about 73 episodes; to compare two policies that
+differ by a few points, several hundred.
 
 ## Compare against today
 

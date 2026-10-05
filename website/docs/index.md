@@ -14,11 +14,24 @@ next second or two of robot actions. The robot-side client then plays those acti
 rate while the next ones are being computed.
 
 ![A simulated robot opens a drawer, driven through vla-serve](assets/img/episode-filmstrip.png)
-<small>A real run: SmolVLA served by vla-serve opens a drawer in the kaair_sim MuJoCo scene in
-7.8 s — 6 requests to the server, 265 motor commands.</small>
+<small>A real run: SmolVLA served by vla-serve opens the bottom drawer in kaair_sim's office scene
+(textures taken from photos of the real room) in 9.6 s — 7 requests to the server, 319 motor
+commands.</small>
 
 It is the sibling of [VisionServe](https://mtbui2010.github.io/vision_serve/) ("Ollama for
 computer vision") for robot policies. Free, open source (Apache-2.0), local, no account.
+
+## Watch: the whole workflow in about a minute
+
+<video controls preload="metadata" playsinline style="width:100%;border-radius:8px"
+       poster="assets/video/vla-serve-tutorial-poster.png">
+  <source src="assets/video/vla-serve-tutorial.mp4" type="video/mp4">
+  Your browser cannot play this video —
+  <a href="assets/video/vla-serve-tutorial.mp4">download it</a>.
+</video>
+
+Build the image, inspect a checkpoint, check the robot, start the server, ask for actions, then
+watch the policy open a drawer in simulation. Every terminal output in the video is real.
 
 ## In one minute
 
@@ -60,7 +73,7 @@ ChunkExecutor(client, get_observation=read_robot, send_action=robot.command, fps
 |---|---|---|
 | pi0.5 | `lerobot/pi05_libero_finetuned` | chunks identical to LeRobot's own policy server |
 | pi0.5 | KETI OpenArm handover (bimanual, 16 joints) | identical; needed the old-version compatibility layer |
-| SmolVLA | kaair_sim open-drawer (MuJoCo) | identical to in-process LeRobot; **47/50** drawers opened through the server vs 49/50 in-process (within noise) |
+| SmolVLA | kaair_sim open-drawer (MuJoCo) | identical to in-process LeRobot; office scene **42/50 vs 42/50** (both on CPU); plain scene 47/50 vs 49/50 |
 
 ## Learn VLAs here
 

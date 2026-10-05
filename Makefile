@@ -142,10 +142,14 @@ docker-save: ## Export the image for another machine: vla-serve-<tag>.tar.gz (~8
 
 KAAIR_CONTAINER ?= kaair_sim_humble
 KAAIR_CKPT ?= smolvla_open_drawer_500_20260924/checkpoints/020000/pretrained_model
+KAAIR_TASK ?= task_open_drawer_generic.yaml
+KAAIR_RAND ?= randomization.yaml
+# --camera-model for the real-texture scene (KAAIR_TASK=task_open_drawer.yaml KAAIR_RAND=randomization_real.yaml)
+KAAIR_EXTRA ?=
 N   ?= 50
 TAG ?= vlaserve_$(shell date +%Y%m%d)
 
-kaair-eval: ## Sim eval through a server started with CKPT_ROOT=/mnt/nas/lerobot_shared/kaair_sim/checkpoints [KAAIR_CKPT=... N=50]
+kaair-eval: ## Sim eval via a server with CKPT_ROOT=<kaair checkpoints> [KAAIR_CKPT KAAIR_TASK KAAIR_RAND KAAIR_EXTRA N]
 	docker exec $(KAAIR_CONTAINER) mkdir -p /tmp/vlaclient
 	docker cp vlaserve $(KAAIR_CONTAINER):/tmp/vlaclient/
 	docker cp examples/kaair_sim_eval.py $(KAAIR_CONTAINER):/tmp/vlaclient/
@@ -153,7 +157,7 @@ kaair-eval: ## Sim eval through a server started with CKPT_ROOT=/mnt/nas/lerobot
 	docker exec $(KAAIR_CONTAINER) bash -lc 'cd /sim && PYTHONPATH=/tmp/vlaclient:/tmp/vlaclient/deps \
 		/sim/.venv/bin/python /tmp/vlaclient/kaair_sim_eval.py --url $(URL) \
 		--server-model /ckpt/$(KAAIR_CKPT) --ckpt /nas/checkpoints/$(KAAIR_CKPT) \
-		--task task_open_drawer_generic.yaml --tag $(TAG) --videos 0 --n $(N)'
+		--task $(KAAIR_TASK) --rand-config $(KAAIR_RAND) $(KAAIR_EXTRA) --tag $(TAG) --videos 0 --n $(N)'
 	docker exec $(KAAIR_CONTAINER) rm -rf /tmp/vlaclient
 
 clean: ## Remove caches and build artefacts
