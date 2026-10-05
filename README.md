@@ -67,7 +67,11 @@ vla-serve serve lerobot/pi05_libero_finetuned
 | `GET /v1/models` | loaded models |
 | `POST /v1/act` (msgpack) | `{"model", "observation": {"images": {cam: HxWx3 uint8}, "state", "task"}, "seed"?}` → `{"actions": (H, D) float32, "action_names", "n_action_steps", "timings_ms"}` |
 
-Images go raw (bit-exact) at any resolution; the server resizes exactly as LeRobot does.
+The client prepares frames before sending (both defaults, both switchable on `PolicyClient`):
+`resize="auto"` resizes-with-pad each frame to the policy's network input exactly as the policy
+would, so neither the server nor the policy resizes again; `encoding="jpeg"` sends JPEG quality 95
+with 4:4:4 chroma (two 480×848 frames: 2.44 MB → ~97 kB). `resize="off"`, `encoding="raw"` send
+frames as captured, bit-exact. The server never resizes.
 Errors in the observation return 400 with the reason, never 500.
 
 ## Tests

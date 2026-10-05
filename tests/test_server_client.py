@@ -22,6 +22,7 @@ class FakeBackend(Backend):
 
     def predict(self, obs, seed=None):
         self.spec.validate(obs.images, obs.state, obs.task)
+        self.last = obs
         time.sleep(self.delay)
         h = self.spec.chunk_size
         a = np.repeat((obs.state[0] + np.arange(h, dtype=np.float32))[:, None], self.spec.action_dim, 1)
@@ -51,6 +52,42 @@ def app_and_client(ckpt):
     client = PolicyClient("http://testserver", model="m")
     client._http = http
     return manager, client, made
+
+
+def test_client_resizes_to_network_input_and_sends_jpeg(ckpt):
+    """A SmolVLA-like checkpoint: frames arrive resized-with-pad to the declared input."""
+    import json
+    cfg = json.loads((ckpt / "config.json").read_text())
+    cfg.update(type="smolvla", resize_imgs_with_padding=[40, 30])      # (W, H) as SmolVLA stores it
+    (ckpt / "config.json").write_text(json.dumps(cfg))
+    spec = PolicySpec.from_checkpoint(ckpt)
+    made = {}
+
+    def resolver(name):
+        return ResolvedModel(name, Path(ckpt), Entry(name, str(ckpt)), LicenseInfo("unknown", "none"))
+
+    def factory(resolved, device):
+        made["b"] = FakeBackend(spec)
+        return made["b"]
+
+    http = TestClient(create_app(ModelManager("cpu", factory=factory, resolver=resolver)))
+    frames = {"front": np.full((60, 120, 3), 200, np.uint8), "wrist": np.full((90, 60, 3), 90, np.uint8)}
+
+    client = PolicyClient("http://testserver", model="m"); client._http = http
+    client.load()
+    client.act(frames, state=[0, 0, 0, 0], task="t")
+    got = made["b"].last.images
+    assert got["front"].shape == got["wrist"].shape == (30, 40, 3)
+    assert got["front"][:8, :, 0].max() <= 3           # 60x120 -> 20x40 + 10 black rows on top (JPEG edge: 2)
+    assert abs(int(got["front"][20, 20, 0]) - 200) <= 3  # JPEG: close, not exact
+
+    raw = PolicyClient("http://testserver", model="m", resize="off", encoding="raw"); raw._http = http
+    raw.act(frames, state=[0, 0, 0, 0], task="t")
+    got = made["b"].last.images
+    assert got["front"].shape == (60, 120, 3) and np.array_equal(got["front"], frames["front"])
+
+    with pytest.raises(ValueError):
+        PolicyClient(encoding="png")
 
 
 def images():

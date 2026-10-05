@@ -21,6 +21,9 @@ Started 2026-10-04. Read `CLAUDE.md` (rules and settled decisions) first, then t
 
 **Not done**
 
+0. **Edge path proposal (not started, deferred by the user)**: `docs/PROPOSAL-edge.md` — inspect --deep,
+   doctor, convert to ONNX/TRT with verification tiers A/B1/B2/B3/C and a noise-relative threshold.
+
 1. **Closed-loop check in simulation** (`vla-serve check --sim libero`). The single most useful
    next feature: parity proves we match LeRobot, not that the policy works on the robot setup.
    `lerobot/pi05_libero_finetuned` + the LIBERO install in the old `lerobot` env
@@ -33,7 +36,12 @@ Started 2026-10-04. Read `CLAUDE.md` (rules and settled decisions) first, then t
    match tensors and still lose task success.
 4. **Smoother chunk merging.** `ActionQueue.on_chunk` is latest-wins. Real-time chunking /
    temporal ensembling (LeRobot has `policies/rtc/`) can replace it in one place.
-5. **JPEG transport** for WiFi robots (raw frames are ~8 MB per 3x720p request).
+5. ~~JPEG transport~~ done 2026-10-05: client-side resize to the network input + JPEG q95 4:4:4 by
+   default (`vlaserve/imaging.py`). Verified on SmolVLA only; pi0-family resize rule is code-verified
+   against LeRobot (tests/test_imaging.py) but not closed-loop. A pi0.5 fidelity probe on
+   out-of-distribution frames was inconclusive (the policy itself varied by 2 rad across seeds).
+   Closed loop, office scene, CPU server: defaults 44/50 vs raw 42/50 (paired 4 vs 2, p = 0.69).
+   Results file: `…/real500_multidrawer_20260928/eval/020000_real_vlaserve_cpu_jpeg_20261005_results.json`.
 6. **ROS 2 node** wrapping `ChunkExecutor`.
 7. `examples/robot_loop.py` has stub robot I/O; it has not been run against a real robot.
 8. **Jetson images** (Orin/JetPack 6, Thor/JetPack 7): need an L4T PyTorch base per JetPack and a

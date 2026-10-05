@@ -28,8 +28,11 @@ Request (`content-type: application/msgpack`):
 }
 ```
 
-An array travels as `{"__nd__": true, "dtype": "uint8", "shape": [H, W, 3], "data": <bytes>}`;
-`vlaserve.codec.packb` does this for you. Images may be any resolution.
+A frame travels either as JPEG, `{"__jpeg__": true, "data": <bytes>}` (the client default), or
+raw, `{"__nd__": true, "dtype": "uint8", "shape": [H, W, 3], "data": <bytes>}`; `vlaserve.codec`
+does both. Images may be any resolution: the server passes them to the policy as received. The
+Python client resizes them first to the policy's network input (`spec.image_input`), so the
+policy's own resize is skipped.
 
 Response:
 
@@ -42,6 +45,24 @@ Response:
   "timings_ms": {"preprocess": 3.5, "inference": 300.8, "postprocess": 2.7, "total": 307.0},
 }
 ```
+
+## Client options
+
+```python
+PolicyClient(url, model, resize="auto", encoding="jpeg", jpeg_quality=95)
+```
+
+| option | default | effect |
+|---|---|---|
+| `resize` | `"auto"` | resize-with-pad to `spec.image_input` (`{"size": [H, W], "pad": "top_left"\|"center"}`), exactly as the policy would; families without a known rule are sent as captured. `"off"`: send as captured |
+| `encoding` | `"jpeg"` | JPEG, 4:4:4 chroma. `"raw"`: exact uint8 arrays |
+| `jpeg_quality` | `95` | 1–100 |
+
+Measured on the office-scene SmolVLA (two 480×848 frames → 512×512): 2.44 MB raw → ~97 kB,
+≈ 30 ms client-side resize + 3 ms encode; for the same seed the action chunk moves by ≤ 0.024 rad,
+0.09× the spread across noise seeds. JPEG's default 4:2:0 chroma subsampling is avoided on purpose:
+at quality 90 it moved actions as much as a different noise draw. Closed loop, office scene, same
+50 scenes, server on CPU: 44/50 with these defaults vs 42/50 with raw frames (paired p = 0.69).
 
 ## Errors
 

@@ -13,6 +13,7 @@ dependencies = [
     "httpx",
     "pyyaml",
     "huggingface_hub",
+    "pillow",            # JPEG for camera frames on the wire
 ]
 
 [project.optional-dependencies]

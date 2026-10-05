@@ -1,8 +1,8 @@
 """msgpack with numpy arrays: the wire format for /v1/act.
 
-Raw arrays, not JPEG: a camera frame goes to the policy bit-exact, so the server sees what the
-client saw. Three 720p frames are ~8 MB, which is fine on localhost or a LAN; JPEG can be added
-as an opt-in encoding when someone needs WiFi.
+Arrays travel raw ({dtype, shape, bytes}) or, for camera frames, as JPEG ({"__jpeg__": true,
+"data": bytes}), decoded here into an HxWx3 uint8 array. The client sends JPEG by default (see
+imaging.py and PolicyClient(encoding=...)); raw keeps frames bit-exact.
 
 Every length read from the wire is checked before memory is spent on it.
 """
@@ -19,6 +19,12 @@ from .errors import ObservationError
 MAX_BODY_BYTES = 64 * 1024 * 1024
 ALLOWED_DTYPES = {"uint8", "float32", "float64", "int32", "int64"}
 _TAG = "__nd__"
+_JPEG = "__jpeg__"
+
+
+def jpeg(data: bytes) -> dict:
+    """Wrap JPEG bytes for the wire; decoded server-side into an HxWx3 uint8 array."""
+    return {_JPEG: True, "data": data}
 
 
 def _default(obj: Any):
@@ -33,6 +39,15 @@ def _default(obj: Any):
 
 
 def _hook(d: dict):
+    if d.get(_JPEG) is True:
+        data = d.get("data")
+        if not isinstance(data, bytes):
+            raise ObservationError("jpeg data must be bytes")
+        from .imaging import decode_jpeg
+        try:
+            return decode_jpeg(data)
+        except Exception as e:
+            raise ObservationError(f"bad JPEG frame: {e}") from e
     if d.get(_TAG) is not True:
         return d
     dtype, shape, data = d.get("dtype"), d.get("shape"), d.get("data")

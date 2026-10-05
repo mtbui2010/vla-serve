@@ -50,11 +50,52 @@ class Chunk:
 
 
 class PolicyClient:
+    """HTTP client for one vla-serve server.
+
+    Frames are prepared on this side before they are sent (both defaults, both switchable):
+
+      resize="auto"   resize-with-pad each frame to the policy's network input, exactly as the
+                      policy itself would (imaging.resize_with_pad), so the server and the policy
+                      pass it through untouched. The rule comes from GET /v1/spec, once per model.
+                      Policy families without a known rule are sent as captured. "off" disables.
+      encoding="jpeg" JPEG at `jpeg_quality` (95), 4:4:4 chroma, on the wire (~27x smaller than raw
+                      for two 480x848 frames; actions within 0.12x of the seed-to-seed spread on
+                      the measured SmolVLA). "raw" sends exact uint8 arrays.
+    """
+
     def __init__(self, url: str = "http://127.0.0.1:11450", model: str | None = None,
-                 timeout: float = 30.0):
+                 timeout: float = 30.0, resize: str = "auto", encoding: str = "jpeg",
+                 jpeg_quality: int = 95):
+        if resize not in ("auto", "off"):
+            raise ValueError("resize must be 'auto' or 'off'")
+        if encoding not in ("jpeg", "raw"):
+            raise ValueError("encoding must be 'jpeg' or 'raw'")
+        if not (1 <= jpeg_quality <= 100):
+            raise ValueError("jpeg_quality must be in 1..100")
         self.url = url.rstrip("/")
         self.model = model
+        self.resize, self.encoding, self.jpeg_quality = resize, encoding, jpeg_quality
         self._http = httpx.Client(timeout=timeout)
+        self._image_input: dict[str, dict | None] = {}
+
+    def image_input(self, model: str | None = None) -> dict | None:
+        """The policy's network-input rule ({"size": [H, W], "pad": ...}), fetched once per model."""
+        name = model or self.model
+        if name not in self._image_input:
+            self._image_input[name] = self.spec(name)["spec"].get("image_input")
+        return self._image_input[name]
+
+    def prepare(self, img: np.ndarray, model: str | None = None):
+        """One camera frame -> what goes on the wire, after the configured resize and encoding."""
+        from . import imaging
+        img = np.ascontiguousarray(img, dtype=np.uint8)
+        if self.resize == "auto" and img.ndim == 3 and img.shape[2] == 3:
+            rule = self.image_input(model)
+            if rule:
+                img = imaging.resize_with_pad(img, *rule["size"], pad=rule["pad"])
+        if self.encoding == "jpeg" and img.ndim == 3 and img.shape[2] == 3:
+            return codec.jpeg(imaging.encode_jpeg(img, self.jpeg_quality))
+        return img
 
     def _check(self, r: httpx.Response) -> httpx.Response:
         if r.status_code >= 400:
@@ -80,7 +121,7 @@ class PolicyClient:
 
     def act(self, images: dict[str, np.ndarray], state=None, task: str | None = None,
             seed: int | None = None, model: str | None = None) -> Chunk:
-        obs = {"images": {k: np.ascontiguousarray(v, dtype=np.uint8) for k, v in images.items()}}
+        obs = {"images": {k: self.prepare(v, model) for k, v in images.items()}}
         if state is not None:
             obs["state"] = np.asarray(state, dtype=np.float32)
         if task is not None:

@@ -94,7 +94,11 @@ Either would replace one function, `ActionQueue.on_chunk`.
 
 * Measure round-trip time on the real network, then set `refill_at` above latency × fps.
 * `RunStats.stalls` should be 0. If it is not, the robot is pausing.
-* Raw camera frames are large (two 480×848 frames ≈ 2.4 MB per request). On WiFi, transfer time
-  adds to latency; compressed transport is on the roadmap.
+* On one machine the HTTP layer costs ≈ 12 ms per chunk (measured over 19 chunks), about 3–4 %
+  of inference. Over a network, frame size dominates: two raw 480×848 frames are 2.44 MB, which is
+  why the client resizes to the network input and sends JPEG by default (~97 kB). Check that
+  compression does not change your policy's actions: compare chunks with `encoding="raw"` for the
+  same seed, relative to the spread across seeds (≤ 0.09× on the measured SmolVLA; 4:2:0 chroma
+  subsampling at quality 90 was 1.0×).
 
 **Next:** [Evaluating a policy →](07-evaluation.md)

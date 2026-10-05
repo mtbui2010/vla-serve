@@ -52,6 +52,29 @@ def safetensors_shapes(path: Path) -> dict[str, list[int]]:
     return {k: v["shape"] for k, v in meta.items() if k != "__metadata__"}
 
 
+# How each policy family turns a camera frame into its network input, read from LeRobot 0.6.1:
+#   smolvla      common/vla_utils.resize_with_pad, target = resize_imgs_with_padding stored as
+#                (WIDTH, HEIGHT) (modeling_smolvla swaps it), padding on the LEFT and TOP;
+#   xvla         the same function, but resize_imgs_with_padding passed as (HEIGHT, WIDTH);
+#   pi0/pi05/pi0_fast   common/vla_utils.resize_with_pad_torch, target = image_resolution (H, W),
+#                padding split evenly (centred).
+# All use bilinear, align_corners=False, no antialias, black (0) padding, and all skip the resize
+# when the frame already has the target size. So a client that sends frames already resized this
+# way gets exactly the network input, and the policy does not resize again. Families not listed
+# get no client-side resize: their frames are sent as captured.
+def image_input_rule(cfg: dict) -> dict | None:
+    t = cfg.get("type")
+    rip = cfg.get("resize_imgs_with_padding")
+    if t == "smolvla" and rip:
+        return {"size": [int(rip[1]), int(rip[0])], "pad": "top_left"}
+    if t == "xvla" and rip:
+        return {"size": [int(rip[0]), int(rip[1])], "pad": "top_left"}
+    if t in ("pi0", "pi05", "pi0_fast") and cfg.get("image_resolution"):
+        r = cfg["image_resolution"]
+        return {"size": [int(r[0]), int(r[1])], "pad": "center"}
+    return None
+
+
 def _preprocessor(path: Path) -> list[dict]:
     pre = path / "policy_preprocessor.json"
     return json.loads(pre.read_text()).get("steps", []) if pre.is_file() else []
@@ -69,6 +92,7 @@ class PolicySpec:
     policy_fills: list[str] = field(default_factory=list)  # policy cameras nobody sends (padded)
     language: bool = True        # whether the processor pipeline tokenises a task string
     source: str = "config"       # "stats" or "config": where cameras / dims came from
+    image_input: dict | None = None   # {"size": [H, W], "pad": "top_left"|"center"}: the network input
     extra: dict[str, Any] = field(default_factory=dict)
 
     @property
@@ -84,7 +108,8 @@ class PolicySpec:
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> "PolicySpec":
         """Inverse of to_dict (what GET /v1/spec returns), for clients."""
-        d = {k: v for k, v in d.items() if k != "required_cameras"}
+        known = set(cls.__dataclass_fields__)
+        d = {k: v for k, v in d.items() if k in known}   # tolerate newer/older servers
         d["cameras"] = {k: (tuple(v) if v else None) for k, v in d["cameras"].items()}
         return cls(**d)
 
@@ -156,6 +181,7 @@ class PolicySpec:
             policy_fills=fills,
             language=language,
             source=source,
+            image_input=image_input_rule(cfg),
             extra=extra,
         )
 

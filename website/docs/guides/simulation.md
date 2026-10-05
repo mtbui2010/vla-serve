@@ -57,6 +57,7 @@ compare with an in-process run on CPU, device for device.
     | vla-serve, policy on **CPU** | **42 / 50** |
     | in-process LeRobot, policy on **CPU** | **42 / 50** |
     | vla-serve, policy on GPU | 36 / 50 |
+    | vla-serve, CPU, **client resize + JPEG q95 4:4:4** (the client default) | **44 / 50** |
 
     On the same device the two are indistinguishable: 3 scenes only one of them solved, 3 only
     the other (paired test p = 1.0), and the same five hard scenes failed in both. The GPU run is

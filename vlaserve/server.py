@@ -88,6 +88,9 @@ class ModelManager:
             self._models[name] = Loaded(resolved, backend, device)
             return self._models[name]
 
+    def resolve(self, name: str) -> ResolvedModel:
+        return self._resolve(name)
+
     def get(self, name: str) -> Loaded:
         if name not in self._models:
             raise ModelNotLoaded(f"'{name}' is not loaded; POST /v1/models/load first. "
@@ -158,7 +161,7 @@ def create_app(manager: ModelManager) -> FastAPI:
 
     @app.get("/v1/spec")
     async def spec(model: str):
-        r = await run_in_threadpool(resolve, model)
+        r = await run_in_threadpool(manager.resolve, model)
         return {"model": model, "path": str(r.path), "spec": PolicySpec.from_checkpoint(r.path).to_dict(),
                 "license": r.license.license, "license_warning": r.license.warning}
 
