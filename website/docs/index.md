@@ -21,7 +21,7 @@ commands.</small>
 It is the sibling of [VisionServe](https://mtbui2010.github.io/vision_serve/) ("Ollama for
 computer vision") for robot policies. Free, open source (Apache-2.0), local, no account.
 
-## Watch: the whole workflow in about a minute
+## Watch: the whole workflow, narrated (4 min)
 
 <video controls preload="metadata" playsinline style="width:100%;border-radius:8px"
        poster="assets/video/vla-serve-tutorial-poster.png">
@@ -30,8 +30,10 @@ computer vision") for robot policies. Free, open source (Apache-2.0), local, no 
   <a href="assets/video/vla-serve-tutorial.mp4">download it</a>.
 </video>
 
-Build the image, inspect a checkpoint, check the robot, start the server, ask for actions, then
-watch the policy open a drawer in simulation. Every terminal output in the video is real.
+Why deploying a VLA is hard, then each step: build the image, inspect a checkpoint, check the
+robot, start the server, ask for actions, see how action chunks keep the robot moving, watch the
+policy open a drawer in simulation, and how we know serving does not change the policy. English
+voice-over with subtitles; every terminal output is real.
 
 ## In one minute
 
