@@ -1,6 +1,6 @@
 {"rows": [
- {"label": "vla-serve · CPU · resize + JPEG (default)", "sub": "office scene, same 50 scenes", "k": 44, "n": 50, "served": true},
- {"label": "vla-serve · CPU · raw frames", "sub": "office scene, same 50 scenes", "k": 42, "n": 50, "served": true},
+ {"label": "vlaserve · CPU · resize + JPEG (default)", "sub": "office scene, same 50 scenes", "k": 44, "n": 50, "served": true},
+ {"label": "vlaserve · CPU · raw frames", "sub": "office scene, same 50 scenes", "k": 42, "n": 50, "served": true},
  {"label": "LeRobot in-process · CPU", "sub": "office scene, same 50 scenes", "k": 42, "n": 50, "served": false},
- {"label": "vla-serve · GPU · raw frames", "sub": "office scene (vs CPU: p = 0.11)", "k": 36, "n": 50, "served": true}],
+ {"label": "vlaserve · GPU · raw frames", "sub": "office scene (vs CPU: p = 0.11)", "k": 36, "n": 50, "served": true}],
  "caption": ""}

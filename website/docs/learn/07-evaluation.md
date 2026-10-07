@@ -39,7 +39,7 @@ the previous episodes consumed.
 
 !!! measured "Measured"
     kaair_sim scene 4: succeeded inside a 50-episode run, but failed **5 of 5** times when run
-    alone from a fresh process (in-process LeRobot) and 4 of 5 through vla-serve. A fresh process
+    alone from a fresh process (in-process LeRobot) and 4 of 5 through vlaserve. A fresh process
     starts from the same default random state, so it drew the same unlucky noise every time.
 
 **Seed the policy's noise per episode** (e.g. `torch.manual_seed(scene_seed)`) to make runs
@@ -56,8 +56,8 @@ from 98 %.** Running the *same* 50 scenes in both conditions helps: compare epis
 (McNemar's test on the scenes where the two disagree).
 
 !!! measured "A worked example: is the server, or the device, to blame?"
-    Office scene, same 50 scenes. Through vla-serve on GPU: 36/50. In-process on CPU: 42/50.
-    Two things differ — the serving path *and* the device. Run vla-serve on CPU as well: 42/50,
+    Office scene, same 50 scenes. Through vlaserve on GPU: 36/50. In-process on CPU: 42/50.
+    Two things differ — the serving path *and* the device. Run vlaserve on CPU as well: 42/50,
     with the same five hard scenes failing as in-process. The serving path is cleared; what
     remains is device and noise, and that 36 vs 42 is itself not significant (p = 0.11).
     Change one thing at a time.

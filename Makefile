@@ -1,4 +1,4 @@
-# Makefile — vla-serve
+# Makefile — vlaserve
 # `make help` lists every target. Parameters go on the command line: make serve MODEL=pi05-libero GPU=3
 
 # --- Environment (local, non-container targets) ---
@@ -22,8 +22,8 @@ HF_CACHE ?= $(HOME)/.cache/huggingface
 OFFLINE  ?= 0
 
 # --- Docker ---
-IMAGE     ?= vla-serve:gpu-$(TORCH_CUDA)
-CONTAINER ?= vla-serve
+IMAGE     ?= vlaserve:gpu-$(TORCH_CUDA)
+CONTAINER ?= vlaserve
 # Optional host directory of checkpoints, mounted read-only at /ckpt; then MODEL=/ckpt/<...>.
 CKPT_ROOT ?=
 DOCKER_GPUS := $(if $(GPU),'"device=$(GPU)"',all)
@@ -57,22 +57,22 @@ install-client: ## Robot side: install only the light client into the current Py
 ## --- Inspect (no GPU, works with the client-only install) ---
 
 list: ## List model aliases and robot profiles
-	$(LOCAL_ENV) $(ENV_BIN)/vla-serve list
+	$(LOCAL_ENV) $(ENV_BIN)/vlaserve list
 
 inspect: ## Cameras, state/action size, chunk, licence: make inspect MODEL=<alias|repo|path>
-	$(LOCAL_ENV) $(ENV_BIN)/vla-serve inspect $(MODEL)
+	$(LOCAL_ENV) $(ENV_BIN)/vlaserve inspect $(MODEL)
 
 check: ## Robot profile vs policy: make check MODEL=... PROFILE=openarm-bimanual
 	@test -n "$(PROFILE)" || { echo "usage: make check MODEL=... PROFILE=<name|file.yaml>"; exit 2; }
-	$(LOCAL_ENV) $(ENV_BIN)/vla-serve check $(MODEL) --profile $(PROFILE)
+	$(LOCAL_ENV) $(ENV_BIN)/vlaserve check $(MODEL) --profile $(PROFILE)
 
 ## --- Run locally (conda env) ---
 
 serve: ## Start the server: make serve MODEL=... [GPU=3] [PORT=11450] [HOST=127.0.0.1] [OFFLINE=1]
-	$(LOCAL_ENV) $(ENV_BIN)/vla-serve serve --host $(HOST) --port $(PORT) $(MODEL)
+	$(LOCAL_ENV) $(ENV_BIN)/vlaserve serve --host $(HOST) --port $(PORT) $(MODEL)
 
 bench: ## In-process latency, synthetic inputs: make bench MODEL=... [GPU=3]
-	$(LOCAL_ENV) $(ENV_BIN)/vla-serve bench $(MODEL)
+	$(LOCAL_ENV) $(ENV_BIN)/vlaserve bench $(MODEL)
 
 ## --- Talk to a running server (local or container) ---
 
@@ -101,7 +101,7 @@ test-gpu: ## Parity vs LeRobot on real checkpoints: make test-gpu GPU=3 [HF_CACH
 
 ## --- Docker ---
 
-docker: ## Build the GPU server image IMAGE=vla-serve:gpu-cu128 [TORCH_CUDA=cu126]
+docker: ## Build the GPU server image IMAGE=vlaserve:gpu-cu128 [TORCH_CUDA=cu126]
 	docker build -f deploy/Dockerfile --build-arg TORCH_CUDA=$(TORCH_CUDA) \
 		--build-arg TORCH_VERSION=$(TORCH_VERSION) --build-arg TORCHVISION_VERSION=$(TORCHVISION_VERSION) \
 		-t $(IMAGE) .
@@ -113,7 +113,7 @@ docker-run: ## Start the server container: make docker-run MODEL=... [GPU=3] [CK
 		-p $(HOST):$(PORT):11450 \
 		-v $(HF_CACHE):/root/.cache/huggingface \
 		$(if $(CKPT_ROOT),-v $(CKPT_ROOT):/ckpt:ro) \
-		$(if $(wildcard $(HOME)/.config/vla-serve),-v $(HOME)/.config/vla-serve:/root/.config/vla-serve:ro) \
+		$(if $(wildcard $(HOME)/.config/vlaserve),-v $(HOME)/.config/vlaserve:/root/.config/vlaserve:ro) \
 		$(if $(filter 1,$(OFFLINE)),-e HF_HUB_OFFLINE=1) \
 		$(IMAGE) serve --host 0.0.0.0 $(MODEL)
 	@echo "starting; loading takes 1.5-5 min. Watch: make docker-logs   Ready: make health"
@@ -134,7 +134,7 @@ docker-test-gpu: ## Parity tests inside the image: make docker-test-gpu GPU=3 [H
 	docker run --rm --gpus $(DOCKER_GPUS) -e HF_HUB_OFFLINE=1 -v $(HF_CACHE):/root/.cache/huggingface \
 		--entrypoint python $(IMAGE) -m pytest -m gpu -s -q -p no:warnings tests/test_gpu_parity.py
 
-docker-save: ## Export the image for another machine: vla-serve-<tag>.tar.gz (~8.5 GB before gzip)
+docker-save: ## Export the image for another machine: vlaserve-<tag>.tar.gz (~8.5 GB before gzip)
 	docker save $(IMAGE) | gzip > $(subst :,-,$(IMAGE)).tar.gz
 	@echo "on the other machine: docker load < $(subst :,-,$(IMAGE)).tar.gz"
 

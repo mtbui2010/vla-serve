@@ -77,7 +77,7 @@ Example: 300 ms latency at 30 Hz is 9 ticks; with 30-step chunks the default `re
 leaves margin.
 
 !!! warning "Safety"
-    vla-serve does not limit velocities, workspace or forces. Keep your robot's own limits and
+    vlaserve does not limit velocities, workspace or forces. Keep your robot's own limits and
     an emergency stop. A policy that worked in simulation can still do something unexpected on
     hardware. Keep `fps` equal to the rate the training data was recorded at (the actions are
     spaced for it), and start with the robot controller's own speed scaling turned down.

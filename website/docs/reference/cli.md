@@ -1,14 +1,14 @@
 # Command line and Makefile
 
-## `vla-serve`
+## `vlaserve`
 
 | command | needs | does |
 |---|---|---|
-| `vla-serve list` | client install | aliases and bundled robot profiles |
-| `vla-serve inspect MODEL` | client install | spec + licence as JSON, from metadata only |
-| `vla-serve check MODEL --profile P` | client install | exit 0 if compatible, 1 with the list of problems |
-| `vla-serve serve [MODEL ...] [--host] [--port 11450] [--device cuda]` | server install | start the server, preloading models |
-| `vla-serve bench MODEL [-n 20] [--warmup 3] [--device]` | server install | in-process latency with synthetic inputs |
+| `vlaserve list` | client install | aliases and bundled robot profiles |
+| `vlaserve inspect MODEL` | client install | spec + licence as JSON, from metadata only |
+| `vlaserve check MODEL --profile P` | client install | exit 0 if compatible, 1 with the list of problems |
+| `vlaserve serve [MODEL ...] [--host] [--port 11450] [--device cuda]` | server install | start the server, preloading models |
+| `vlaserve bench MODEL [-n 20] [--warmup 3] [--device]` | server install | in-process latency with synthetic inputs |
 
 `MODEL` is an alias, a local checkpoint directory, or an HF repo id. Environment variables:
 `HF_HOME` / `HF_HUB_OFFLINE` (Hugging Face cache), `VLASERVE_REGISTRY` (path of your registry

@@ -14,9 +14,9 @@ Started 2026-10-04. Read `CLAUDE.md` (rules and settled decisions) first, then t
 - HTTP server + msgpack codec + client + `ChunkExecutor`; 34 fast tests.
 - GPU parity against LeRobot's policy server on two real pi0.5 checkpoints — see
   *Measurements* below.
-- **Client/server split.** `pip install vla-serve` = robot-side client only (83 MB, no torch;
+- **Client/server split.** `pip install vlaserve` = robot-side client only (83 MB, no torch;
   verified in a fresh venv and by `tests/test_client_is_light.py`). `[server]` adds LeRobot.
-- **Container** `vla-serve:gpu-cu128` (8.5 GB, `deploy/Dockerfile`, guide in `deploy/README.md`).
+- **Container** `vlaserve:gpu-cu128` (8.5 GB, `deploy/Dockerfile`, guide in `deploy/README.md`).
   Fast tests pass inside it; GPU parity inside it: see *Measurements*.
 
 **Not done**
@@ -24,7 +24,7 @@ Started 2026-10-04. Read `CLAUDE.md` (rules and settled decisions) first, then t
 0. **Edge path proposal (not started, deferred by the user)**: `docs/PROPOSAL-edge.md` — inspect --deep,
    doctor, convert to ONNX/TRT with verification tiers A/B1/B2/B3/C and a noise-relative threshold.
 
-1. **Closed-loop check in simulation** (`vla-serve check --sim libero`). The single most useful
+1. **Closed-loop check in simulation** (`vlaserve check --sim libero`). The single most useful
    next feature: parity proves we match LeRobot, not that the policy works on the robot setup.
    `lerobot/pi05_libero_finetuned` + the LIBERO install in the old `lerobot` env
    (`remote_dir/LIBERO`) are the starting point. LIBERO is not installed in `vlaserve` yet.
@@ -48,7 +48,7 @@ Started 2026-10-04. Read `CLAUDE.md` (rules and settled decisions) first, then t
    device to test on. Image not pushed to any registry.
 9. Not git-initialised; no GitHub remote. The docs site (`website/`, workflow in
    `.github/workflows/docs.yml`) builds with `mkdocs build --strict` but is not published: it needs
-   the repository on GitHub (assumed `mtbui2010/vla-serve`; change `site_url`/`repo_url` in
+   the repository on GitHub (assumed `mtbui2010/vlaserve`; change `site_url`/`repo_url` in
    `website/mkdocs.yml` otherwise) and Pages set to "GitHub Actions".
 10. Docs figures and the tutorial video come from data recorded 2026-10-05 in kaair_sim's office scene (`website/tools/README.md`). Re-record them
    if the served models or the executor change.
@@ -101,15 +101,15 @@ sample: 180 ms — not measured properly, do that before recommending compile); 
 400, unknown model → 409.
 
 **SmolVLA, kaair_sim open-drawer** (`smolvla_open_drawer_500_20260924`, step 020000;
-`examples/kaair_sim_eval.py`, server in the `vla-serve:gpu-cu128` container, client in
+`examples/kaair_sim_eval.py`, server in the `vlaserve:gpu-cu128` container, client in
 `kaair_sim_humble`, kaair's own `eval_policy.run()` with only the policy swapped):
 
 | check | result |
 |---|---|
 | served (HTTP, container, GPU) vs in-process LeRobot 0.6.1 GPU, same obs + seed | max\|diff\| **0** (seeds 0, 1) |
 | LeRobot 0.4.4 (kaair's training/eval version) vs 0.6.1, CPU, same obs + noise | max\|diff\| **0** |
-| closed loop, 50 episodes, seeds 10⁹+k, `task_open_drawer_generic.yaml` | vla-serve **47/50 (94 %)**; in-process CPU baseline today 49/50 (98 %); recorded 2026-09-24 48/50 (96 %) |
-| episode 4 alone, 5 fresh runs each | in-process **0/5**, vla-serve 1/5 — a hard scene for the policy, not a serving error |
+| closed loop, 50 episodes, seeds 10⁹+k, `task_open_drawer_generic.yaml` | vlaserve **47/50 (94 %)**; in-process CPU baseline today 49/50 (98 %); recorded 2026-09-24 48/50 (96 %) |
+| episode 4 alone, 5 fresh runs each | in-process **0/5**, vlaserve 1/5 — a hard scene for the policy, not a serving error |
 
 The 94 vs 98 % gap is within noise (Fisher p ≈ 0.6) and every failing episode is explained by
 SmolVLA's sampling noise: unseeded runs differ by up to 0.06 rad between noise draws. The
@@ -119,8 +119,8 @@ sim is synchronous. Note: `kaair_sim_humble` had lost GPU access during these ru
 initialize NVML"), so MuJoCo rendered on CPU (~31 s/episode instead of ~9 s).
 
 **Office scene** (photo textures, `smolvla_open_drawer_real500_multidrawer_20260928` step 020000,
-`--camera-model`, 2026-10-05, same 50 scenes): vla-serve on CPU **42/50**, in-process LeRobot on
-CPU **42/50** (discordant 3/3, McNemar p = 1.0; the same five hard scenes fail in both), vla-serve
+`--camera-model`, 2026-10-05, same 50 scenes): vlaserve on CPU **42/50**, in-process LeRobot on
+CPU **42/50** (discordant 3/3, McNemar p = 1.0; the same five hard scenes fail in both), vlaserve
 on GPU 36/50 (vs served-CPU p = 0.11, not significant). Same noise, GPU vs CPU chunk ≤ 0.018 rad;
 different noise ≤ 0.48 rad. kaair_sim's recorded 88 % (2026-09-28) predates its `cabinet.py` change
 of 2026-09-29 and is not comparable. Open question: is the GPU run's lower rate real? Needs an

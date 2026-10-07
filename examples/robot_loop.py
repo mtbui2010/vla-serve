@@ -1,6 +1,6 @@
 """Drive a robot with a served policy. Replace the two stubs with your robot's driver.
 
-    vla-serve serve pi05-libero            # in another terminal (or: serve, then /v1/models/load)
+    vlaserve serve pi05-libero            # in another terminal (or: serve, then /v1/models/load)
     python examples/robot_loop.py --model pi05-libero --profile libero --task "put the bowl on the plate"
 """
 import argparse

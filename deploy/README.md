@@ -1,20 +1,20 @@
-# Running vla-serve in a container
+# Running vlaserve in a container
 
 The server (GPU, torch, LeRobot: ~8-10 GB) goes in the container. The robot computer installs
-only the client (`pip install vla-serve`, ~80 MB, no torch) and talks HTTP to it.
+only the client (`pip install vlaserve`, ~80 MB, no torch) and talks HTTP to it.
 
 ```
 robot PC                           GPU box / Jetson
-pip install vla-serve      HTTP    docker run vla-serve:gpu-cu128
+pip install vlaserve      HTTP    docker run vlaserve:gpu-cu128
 PolicyClient, ChunkExecutor  ──►   serve <model>       ◄── HF cache / checkpoint dir (mounted)
 ```
 
 ## Build
 
 ```bash
-docker build -f deploy/Dockerfile -t vla-serve:gpu-cu128 .
+docker build -f deploy/Dockerfile -t vlaserve:gpu-cu128 .
 # Host driver older than CUDA 12.8 (driver < 570)?
-docker build -f deploy/Dockerfile --build-arg TORCH_CUDA=cu126 -t vla-serve:gpu-cu126 .
+docker build -f deploy/Dockerfile --build-arg TORCH_CUDA=cu126 -t vlaserve:gpu-cu126 .
 ```
 
 ## Run
@@ -23,14 +23,14 @@ docker build -f deploy/Dockerfile --build-arg TORCH_CUDA=cu126 -t vla-serve:gpu-
 # A model from the HF cache (the same cache LeRobot and huggingface-cli use)
 docker run -d --gpus all -p 11450:11450 \
   -v ~/.cache/huggingface:/root/.cache/huggingface \
-  --name vla-serve vla-serve:gpu-cu128 \
+  --name vlaserve vlaserve:gpu-cu128 \
   serve --host 0.0.0.0 pi05-libero
 
 # A local training output: mount it and serve the path
 docker run -d --gpus all -p 11450:11450 \
   -v /data/runs/my_run/checkpoints/last/pretrained_model:/models/my_run:ro \
   -v ~/.cache/huggingface:/root/.cache/huggingface \
-  vla-serve:gpu-cu128 serve --host 0.0.0.0 /models/my_run
+  vlaserve:gpu-cu128 serve --host 0.0.0.0 /models/my_run
 ```
 
 - **The HF cache mount is needed even for local checkpoints:** the tokenizer (e.g.
@@ -45,14 +45,14 @@ docker run -d --gpus all -p 11450:11450 \
   `POST /v1/models/load`.
 
 Your own aliases: mount a registry file and point to it,
-`-v ~/.config/vla-serve:/root/.config/vla-serve:ro`.
+`-v ~/.config/vlaserve:/root/.config/vlaserve:ro`.
 
 ## Verify an image
 
 ```bash
 docker run --rm --gpus '"device=3"' -e HF_HUB_OFFLINE=1 \
   -v /mnt/nas/huggingface:/root/.cache/huggingface \
-  --entrypoint python vla-serve:gpu-cu128 -m pytest -m gpu -q tests/test_gpu_parity.py
+  --entrypoint python vlaserve:gpu-cu128 -m pytest -m gpu -q tests/test_gpu_parity.py
 ```
 
 ## Not done yet

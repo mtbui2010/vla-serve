@@ -1,7 +1,7 @@
 """Data for the docs figures, from the recorded episode's first observation.
 
 1. flow.npz     — x_t at each of the 10 Euler steps (in-process LeRobot, GPU), unnormalised
-2. seeds.npz    — chunks for seeds 0..7 from the running vla-serve server
+2. seeds.npz    — chunks for seeds 0..7 from the running vlaserve server
 3. timeline.npz — a real ChunkExecutor run against the server (30 Hz, stub robot)
 """
 import sys, time, threading

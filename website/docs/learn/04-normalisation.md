@@ -81,9 +81,9 @@ training and LeRobot's own evaluation worked. But any tool that believed `config
 the robot for the wrong cameras and state size — and LeRobot's async policy server would resize
 the 480 × 848 frames to 256 × 256, distorting them.
 
-!!! measured "What vla-serve does"
+!!! measured "What vlaserve does"
     It reads the statistics first (just the safetensors *header*, a few kB, no tensors loaded),
-    then falls back to `config.json`. `vla-serve inspect` on this checkpoint reports
+    then falls back to `config.json`. `vlaserve inspect` on this checkpoint reports
     `cameras: head, wrist · state 8 · source: stats`.
 
 ## What this means when you deploy

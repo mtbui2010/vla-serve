@@ -1,10 +1,10 @@
-"""vla-serve command line.
+"""vlaserve command line.
 
-    vla-serve list                                   aliases and robot profiles
-    vla-serve inspect MODEL                          spec + licence, from config.json only
-    vla-serve check MODEL --profile PROFILE          robot vs policy, before anything moves
-    vla-serve serve [MODEL ...] [--port 11450]       start the server, optionally preloading
-    vla-serve bench MODEL [-n 20]                    in-process latency with synthetic inputs
+    vlaserve list                                   aliases and robot profiles
+    vlaserve inspect MODEL                          spec + licence, from config.json only
+    vlaserve check MODEL --profile PROFILE          robot vs policy, before anything moves
+    vlaserve serve [MODEL ...] [--port 11450]       start the server, optionally preloading
+    vlaserve bench MODEL [-n 20]                    in-process latency with synthetic inputs
 
 MODEL is a registry alias, a local checkpoint directory, or an HF repo id.
 """
@@ -114,7 +114,7 @@ def cmd_bench(args) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(prog="vla-serve", description=__doc__.split("\n")[0])
+    p = argparse.ArgumentParser(prog="vlaserve", description=__doc__.split("\n")[0])
     p.add_argument("-v", "--verbose", action="store_true")
     sub = p.add_subparsers(dest="cmd", required=True)
 
@@ -141,7 +141,7 @@ def main(argv: list[str] | None = None) -> int:
         missing = [m for m in ("torch", "lerobot", "fastapi", "uvicorn") if absent(m)]
         if missing:
             print(f"error: '{args.cmd}' needs the server dependencies (missing: {', '.join(missing)}).\n"
-                  "  pip install 'vla-serve[server]'   (install the torch build for your CUDA first)\n"
+                  "  pip install 'vlaserve[server]'   (install the torch build for your CUDA first)\n"
                   "  or run the container: see deploy/README.md", file=sys.stderr)
             return 2
     logging.basicConfig(level=logging.INFO if args.verbose or args.cmd == "serve" else logging.WARNING,

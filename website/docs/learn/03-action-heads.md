@@ -89,7 +89,7 @@ or right of the obstacle).
 
 Consequences:
 
-* **To compare two implementations, fix the noise.** vla-serve's `/v1/act` accepts a `seed`;
+* **To compare two implementations, fix the noise.** vlaserve's `/v1/act` accepts a `seed`;
   the parity tests use it. Without it, "different output" proves nothing.
 * **Evaluation outcomes vary with the noise.** One scene in the kaair evaluation failed 5/5 runs
   from a fresh process but succeeded inside a longer run, where earlier episodes had advanced the

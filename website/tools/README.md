@@ -31,7 +31,7 @@ Every figure on the site is drawn from data recorded on real runs. To regenerate
    ```
 
 4. **Latency and statistics**: `DATA/latency.json` holds the median `total` of
-   `vla-serve bench <model> -n 20` for each model; `DATA/stats.npz` holds `mean`/`std` of
+   `vlaserve bench <model> -n 20` for each model; `DATA/stats.npz` holds `mean`/`std` of
    `observation.state` from the checkpoint's normaliser file.
 
 5. **Draw**: `python website/tools/figures.py DATA` → `website/docs/assets/img/*.png`.
@@ -39,7 +39,7 @@ Every figure on the site is drawn from data recorded on real runs. To regenerate
 6. **Video**: capture the command outputs into `DATA/out/` (`inspect.json`, `check_ok.txt`,
    `check_bad.txt`, `health.txt`, `serverlog.txt`, `client.txt`, `images.txt`), copy
    `video_results.json` to `DATA/results.json`, then
-   `python website/tools/make_video.py DATA` → `website/docs/assets/video/vla-serve-tutorial.mp4`.
+   `python website/tools/make_video.py DATA` → `website/docs/assets/video/vlaserve-tutorial.mp4`.
    Narration first (step 7), into `DATA/voice/`. Copy `docs/assets/img/executor-timeline.png` to
    `DATA/`. Poster: `ffmpeg -ss 208 -i …mp4 -frames:v 1 …-poster.png` (the success moment).
 

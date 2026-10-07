@@ -3,7 +3,7 @@
     python website/tools/figures.py <data-dir>
 
 <data-dir> holds the .npz files written by the recording scripts (see website/tools/README.md):
-episode.npz (one kaair_sim episode through vla-serve), flow.npz, seeds.npz, timeline.npz.
+episode.npz (one kaair_sim episode through vlaserve), flow.npz, seeds.npz, timeline.npz.
 Writes PNGs into website/docs/assets/img/. Colours: the validated categorical slots 1-3 and the
 blue ordinal ramp (steps 250-650) of the dataviz reference palette.
 """
@@ -81,7 +81,7 @@ for d, ax in enumerate(axs.flat):
 for ax in axs[1]:
     ax.set_xlabel("time [s]")
 axs[0, 0].legend(loc="upper left")
-fig.suptitle(f"One episode through vla-serve: {len(ep['chunk_steps'])} chunks (grey lines = a new chunk arrives), 50 actions each",
+fig.suptitle(f"One episode through vlaserve: {len(ep['chunk_steps'])} chunks (grey lines = a new chunk arrives), 50 actions each",
              x=0.01, ha="left", fontsize=10, color=INK)
 fig.tight_layout()
 save(fig, "episode-actions.png")
@@ -154,8 +154,8 @@ def wilson(k, n, z=1.96):
     return (c - r) / d, (c + r) / d
 
 
-rows = [("office · vla-serve, CPU", 42), ("office · in-process LeRobot, CPU", 42), ("office · vla-serve, GPU", 36),
-        ("plain · vla-serve, GPU", 47), ("plain · in-process LeRobot, CPU", 49)]
+rows = [("office · vlaserve, CPU", 42), ("office · in-process LeRobot, CPU", 42), ("office · vlaserve, GPU", 36),
+        ("plain · vlaserve, GPU", 47), ("plain · in-process LeRobot, CPU", 49)]
 fig, ax = plt.subplots(figsize=(8, 3.4))
 for i, (name, k_) in enumerate(rows):
     lo, hi = wilson(k_, 50)

@@ -95,7 +95,7 @@ froze the vision encoder (`freeze_vision_encoder: true`) and trained only the ac
 ## What this means when you deploy
 
 * The policy only knows the **cameras, joints and phrasing** it was trained with. Change a camera
-  position or rename a joint order and it may fail silently — hence `vla-serve check`.
+  position or rename a joint order and it may fail silently — hence `vlaserve check`.
 * Most compute is the VLM forward pass, so model size drives latency: about 300 ms per chunk for
   pi0.5 on an RTX A6000 in this repo.
 * The VLM decides the licence: a PaliGemma-based policy inherits the Gemma Terms.

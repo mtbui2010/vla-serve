@@ -4,12 +4,12 @@ There are two halves, and they usually live on different computers:
 
 ```mermaid
 flowchart LR
-  subgraph robot["Robot computer — pip install vla-serve"]
+  subgraph robot["Robot computer — pip install vlaserve"]
     R[cameras + joint encoders] --> C[PolicyClient / ChunkExecutor]
     C --> M[motor commands]
   end
   subgraph gpu["GPU machine — container or conda env"]
-    S[vla-serve server] --> P[LeRobot policy on GPU]
+    S[vlaserve server] --> P[LeRobot policy on GPU]
   end
   C -- "HTTP: frames, state, task" --> S
   S -- "action chunk (H × D)" --> C
@@ -22,8 +22,8 @@ They can also be the same computer: then the URL is `http://127.0.0.1:11450`.
 === "Container (recommended)"
 
     ```bash
-    git clone https://github.com/mtbui2010/vla-serve && cd vla-serve
-    make docker                      # builds vla-serve:gpu-cu128 (≈ 8.5 GB)
+    git clone https://github.com/mtbui2010/vlaserve && cd vlaserve
+    make docker                      # builds vlaserve:gpu-cu128 (≈ 8.5 GB)
     ```
 
     Needs Docker with the NVIDIA container toolkit, and an NVIDIA driver that supports
@@ -32,7 +32,7 @@ They can also be the same computer: then the URL is `http://127.0.0.1:11450`.
 === "Conda environment"
 
     ```bash
-    git clone https://github.com/mtbui2010/vla-serve && cd vla-serve
+    git clone https://github.com/mtbui2010/vlaserve && cd vlaserve
     make env                         # conda env "vlaserve": Python 3.12, torch cu128, LeRobot 0.6.1
     ```
 
@@ -86,7 +86,7 @@ make ps          # loaded models, device, licence
 ## 4. Ask for actions
 
 ```bash
-pip install vla-serve          # on the robot computer: the client only
+pip install vlaserve          # on the robot computer: the client only
 ```
 
 ```python

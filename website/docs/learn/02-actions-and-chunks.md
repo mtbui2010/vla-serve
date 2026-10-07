@@ -34,13 +34,13 @@ a^{\text{abs}}_i = a^{\text{rel}}_i + s_i \quad \text{for every joint } i \text{
 
 In LeRobot this is a pair of processor steps: `relative_actions_processor` in the preprocessor
 remembers the state it saw, and `absolute_actions_processor` in the postprocessor adds it back.
-They must run as a pair, on the same observation — one reason vla-serve holds a per-model lock
+They must run as a pair, on the same observation — one reason vlaserve holds a per-model lock
 around the whole pre → model → post sequence.
 
 !!! code "Where in the code"
     `lerobot/processor/relative_action_processor.py` — `RelativeActionsProcessorStep` caches
     `observation.state`; `AbsoluteActionsProcessorStep` reads it back.
-    vla-serve's `compat.py` exists because LeRobot 0.5 called the first one
+    vlaserve's `compat.py` exists because LeRobot 0.5 called the first one
     `delta_actions_processor`.
 
 ## Why chunks
@@ -74,7 +74,7 @@ Executing fewer than \(H\) steps (`n_action_steps < chunk_size`) makes the robot
 at the cost of more inference calls. Executing all of them is pure open loop for that long: if
 the drawer handle slips during those 1.67 s, the policy will not notice until the next chunk.
 
-A real episode served by vla-serve: seven chunks of 50 actions, each joint's commanded target
+A real episode served by vlaserve: seven chunks of 50 actions, each joint's commanded target
 (blue) and measured position (orange):
 
 ![Actions over one episode](../assets/img/episode-actions.png)
@@ -87,7 +87,7 @@ A real episode served by vla-serve: seven chunks of 50 actions, each joint's com
 
 * Your control loop must run at the **rate the data was recorded at**; actions are spaced for it.
 * The action vector order is fixed by training. Check `action_names` against your driver's joint
-  order (`vla-serve check` does when both sides list them).
+  order (`vlaserve check` does when both sides list them).
 * With relative actions, a wrong state reading corrupts every action of the chunk.
 
 **Next:** [How the action head works →](03-action-heads.md)

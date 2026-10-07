@@ -2,7 +2,7 @@
 
 A serving layer for robot policies has one job: return the action the policy would have returned.
 "Looks reasonable" is not enough — a policy that is slightly off can still move the arm
-smoothly into the wrong place. vla-serve is checked at three levels.
+smoothly into the wrong place. vlaserve is checked at three levels.
 
 ## Level 1 — contract tests (no GPU)
 
@@ -47,7 +47,7 @@ photo-textured office scene **42/50 against 42/50** with both on CPU.
 The closed-loop run also changed the design. That SmolVLA checkpoint's `config.json` declared the
 base model's cameras (`camera1..3`, 256×256, 6-d state) while the policy actually consumed
 `head`/`wrist` at 480×848 and an 8-d state. A server that trusted `config.json` — including
-LeRobot's own policy server — would have squashed every frame to 256×256. vla-serve now reads the
+LeRobot's own policy server — would have squashed every frame to 256×256. vlaserve now reads the
 dataset statistics first and passes frames through unresized.
 
 ## Level 0 — the end-to-end loop

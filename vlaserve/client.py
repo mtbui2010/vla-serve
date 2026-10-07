@@ -50,7 +50,7 @@ class Chunk:
 
 
 class PolicyClient:
-    """HTTP client for one vla-serve server.
+    """HTTP client for one vlaserve server.
 
     Frames are prepared on this side before they are sent (both defaults, both switchable):
 

@@ -3,7 +3,7 @@
 !!! abstract "In this chapter"
     - What each file in a checkpoint directory does.
     - The *processor pipelines* that sit around the network.
-    - Two real ways checkpoints break, and how vla-serve handles them.
+    - Two real ways checkpoints break, and how vlaserve handles them.
 
 ## The directory
 
@@ -18,7 +18,7 @@ pretrained_model/
 └── train_config.json                             how it was trained (dataset, optimiser, …)
 ```
 
-Everything needed to *use* the model is here. That is why vla-serve needs no manifest: the
+Everything needed to *use* the model is here. That is why vlaserve needs no manifest: the
 checkpoint is the manifest.
 
 ## The pipeline around the network
@@ -64,9 +64,9 @@ The real step lists, read from the files:
     ```
 
 !!! code "Where in the code"
-    vla-serve loads both pipelines with LeRobot's own
+    vlaserve loads both pipelines with LeRobot's own
     `make_pre_post_processors(cfg, pretrained_path=...)` in
-    [`backends/lerobot_backend.py`](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/backends/lerobot_backend.py),
+    [`backends/lerobot_backend.py`](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/backends/lerobot_backend.py),
     so every step above runs exactly as in training.
 
 ## Break 1 — a renamed step
@@ -78,7 +78,7 @@ checkpoint, saved with 0.5, then fails to load:
 Processor step 'delta_actions_processor' not found in registry.
 ```
 
-vla-serve's [`compat.py`](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/compat.py)
+vlaserve's [`compat.py`](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/compat.py)
 registers the old name as a subclass of the new step (after checking both take identical
 settings). The files on disk are never modified.
 
@@ -88,15 +88,15 @@ Covered in [chapter 4](04-normalisation.md): after fine-tuning from a base model
 can still describe the base model's inputs. The `rename_map` and the statistics are the truth.
 
 !!! code "Where in the code"
-    [`spec.py`](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/spec.py) builds the
+    [`spec.py`](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/spec.py) builds the
     `PolicySpec` — camera names, state and action sizes — from the statistics file's
     **header only** (8-byte length + JSON, a few kB), then falls back to `config.json`.
-    Run `vla-serve inspect <checkpoint>` to see the result.
+    Run `vlaserve inspect <checkpoint>` to see the result.
 
 ## What this means when you deploy
 
 * Copy the **whole** directory. Weights without the processor files are unusable.
 * Pin the LeRobot version you trained with, or test loading with the version you serve with.
-* When `config.json` and `vla-serve inspect` disagree, believe `inspect` (`source: stats`).
+* When `config.json` and `vlaserve inspect` disagree, believe `inspect` (`source: stats`).
 
 **Next:** [Real-time control →](06-real-time.md)

@@ -1,6 +1,6 @@
-"""Record one kaair_sim open-drawer episode driven through vla-serve (docs figures + video).
+"""Record one kaair_sim open-drawer episode driven through vlaserve (docs figures + video).
 
-Runs inside kaair_sim_humble, against a running vla-serve server. Scene construction is the
+Runs inside kaair_sim_humble, against a running vlaserve server. Scene construction is the
 same as kaair_sim's eval_policy.main(); only the policy is an HTTP client.
 
     python record_episode.py --model /ckpt/<run>/checkpoints/020000/pretrained_model \

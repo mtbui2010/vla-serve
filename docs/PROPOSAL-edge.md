@@ -25,24 +25,24 @@ export can match tensors and still lose task success (one SmolVLA ONNX study: LI
 
 ---
 
-## 2. Proposal for vla-serve
+## 2. Proposal for vlaserve
 
 ### 2.1 `inspect --deep` and `doctor`
 
-- `vla-serve inspect MODEL --deep`
+- `vlaserve inspect MODEL --deep`
   - processor pipeline, `rename_map`, tokenizer and its max length, weight dtypes, estimated VRAM;
   - LeRobot version the checkpoint was saved with vs installed; whether `compat.py` is needed;
   - **statistics sanity**: dimensions with near-zero std (sensor noise gets amplified after
     normalisation), state/action dims that disagree with `config.json`.
 - Inspect an exported ONNX / TRT engine: I/O and fixed shapes (prompt length, image size, number
   of denoising steps).
-- `vla-serve doctor`: torch CUDA build vs driver (the cu130-on-a-12.8-driver failure met in this
+- `vlaserve doctor`: torch CUDA build vs driver (the cu130-on-a-12.8-driver failure met in this
   repo), GPU visible, TensorRT version, free RAM/VRAM. Run before anything else fails.
 
-### 2.2 `vla-serve convert` (separate converter image, like VisionServe)
+### 2.2 `vlaserve convert` (separate converter image, like VisionServe)
 
 ```
-vla-serve convert CKPT --format onnx|trt --precision fp32|fp16|bf16|int8 [--target orin|thor]
+vlaserve convert CKPT --format onnx|trt --precision fp32|fp16|bf16|int8 [--target orin|thor]
 ```
 
 Graph design, following exports others have made work (Arm's SmolVLA ONNX, NVIDIA's pi0.5/GR00T TRT):
@@ -59,11 +59,11 @@ Graph design, following exports others have made work (Arm's SmolVLA ONNX, NVIDI
 
 ### 2.3 Verification tiers for VLAs
 
-| Tier | VisionServe | vla-serve |
+| Tier | VisionServe | vlaserve |
 |---|---|---|
 | A | ONNX vs framework | ONNX/TRT vs PyTorch, **same noise**, max\|Δ\| per joint in robot units |
 | B1 | preprocessing vs reference, with diagnosis | tokens, normalised state, image tensors: server vs LeRobot via a `/v1/debug/preprocess` endpoint; diagnose truncated prompt, wrong tokenizer, wrong stats |
-| B2 | served vs original pipeline | exists (bit-exact parity tests); turn into `vla-serve verify`, on **real dataset frames** instead of random inputs |
+| B2 | served vs original pipeline | exists (bit-exact parity tests); turn into `vlaserve verify`, on **real dataset frames** instead of random inputs |
 | **B3 (new)** | — | **open-loop replay** on held-out dataset episodes: action error vs recorded actions. Cheap, no simulator |
 | C | mAP on user data | **paired closed loop**: same scenes, *noise seeded per episode*, McNemar test (as done for kaair_sim). Plugins: kaair_sim, LIBERO, gym |
 
@@ -84,7 +84,7 @@ little on a transformer detector.
 Besides p50/p95 at three levels:
 
 ```
-vla-serve bench MODEL --fps 30 --chunk 50
+vlaserve bench MODEL --fps 30 --chunk 50
 ```
 
 answers *"does it keep up"*: latency vs chunk duration, minimum `refill_at` = latency × fps,

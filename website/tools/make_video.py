@@ -4,7 +4,7 @@ the simulator, with an English voice-over (tts.py) and timed subtitles.
     python website/tools/make_video.py <data-dir> [out.mp4]
 
 <data-dir> holds
-  episode.npz, episode.mp4   one office-scene episode recorded through vla-serve (record_episode.py)
+  episode.npz, episode.mp4   one office-scene episode recorded through vlaserve (record_episode.py)
   out/*.txt|json             outputs captured from the real commands (see website/tools/README.md)
   results.json               evaluation counts for the results scene
   voice/<scene>.wav, voice/timing.json   narration from tts.py (narration.json)
@@ -26,7 +26,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 DATA = Path(sys.argv[1])
 OUT = Path(sys.argv[2]) if len(sys.argv) > 2 else \
-    Path(__file__).resolve().parents[1] / "docs" / "assets" / "video" / "vla-serve-tutorial.mp4"
+    Path(__file__).resolve().parents[1] / "docs" / "assets" / "video" / "vlaserve-tutorial.mp4"
 OUT.parent.mkdir(parents=True, exist_ok=True)
 W, H, FPS, SR = 1280, 720, 30, 24000
 LEAD, TAIL = 0.4, 0.7                       # silence before / after each scene's narration [s]
@@ -173,7 +173,7 @@ def arrow(d, a, b, color, width=4):
 # --- scenes ------------------------------------------------------------------------------
 def s_title(t):
     im, d = canvas()
-    d.text((48, 210), "vla-serve", font=font(BOLD, 84), fill=INK)
+    d.text((48, 210), "vlaserve", font=font(BOLD, 84), fill=INK)
     d.text((52, 320), "Serve a trained robot policy with one command,", font=font(SANS, 34), fill=INK2)
     d.text((52, 364), "and drive a robot with it.", font=font(SANS, 34), fill=INK2)
     d.text((52, 450), "A 4-minute walkthrough. Every output shown is real — recorded October 2026 on one RTX A6000.",
@@ -187,10 +187,10 @@ def s_problem(t):
     rows = [("Every policy family loads differently", "loads any LeRobot checkpoint from its own files"),
             ("Library upgrades break old checkpoints", "compatibility layer, files never modified"),
             ("config.json can be stale after fine-tuning", "trusts the dataset statistics first"),
-            ("Cameras and joints must match training", "vla-serve check, before anything moves"),
+            ("Cameras and joints must match training", "vlaserve check, before anything moves"),
             ("Model: ~300 ms per call. Robot: 33 ms per step", "action chunks + ChunkExecutor")]
     d.text((70, 128), "Problem", font=font(BOLD, 20), fill=MUTED)
-    d.text((700, 128), "What vla-serve does", font=font(BOLD, 20), fill=MUTED)
+    d.text((700, 128), "What vlaserve does", font=font(BOLD, 20), fill=MUTED)
     span = TIMING["s02_problem"]["duration"]
     for i, (p, s) in enumerate(rows):
         y = 172 + 78 * i
@@ -207,9 +207,9 @@ def s_problem(t):
 def s_overview(t):
     im, d = canvas()
     header(d, "", "Two parts")
-    boxes = [((70, 170, 520, 450), "Robot computer", ["pip install vla-serve  (~80 MB)", "", "reads cameras + joints",
+    boxes = [((70, 170, 520, 450), "Robot computer", ["pip install vlaserve  (~80 MB)", "", "reads cameras + joints",
                                                        "plays actions at 30 Hz", "(ChunkExecutor)"]),
-             ((760, 170, 1210, 450), "GPU machine", ["docker run vla-serve", "", "loads a LeRobot checkpoint",
+             ((760, 170, 1210, 450), "GPU machine", ["docker run vlaserve", "", "loads a LeRobot checkpoint",
                                                      "(pi0.5, SmolVLA, …)", "returns chunks of actions"])]
     for (x0, y0, x1, y1), title, lines in boxes:
         d.rounded_rectangle((x0, y0, x1, y1), 16, outline=GRID, width=3, fill=(255, 255, 255))
@@ -363,8 +363,8 @@ def s_results(t):
 def s_end(t):
     im, d = canvas()
     d.text((48, 190), "Try it", font=font(BOLD, 56), fill=INK)
-    for i, (k, v) in enumerate([("Docs and VLA course", "mtbui2010.github.io/vla-serve"),
-                                ("Code", "github.com/mtbui2010/vla-serve"),
+    for i, (k, v) in enumerate([("Docs and VLA course", "mtbui2010.github.io/vlaserve"),
+                                ("Code", "github.com/mtbui2010/vlaserve"),
                                 ("Every command", "make help")]):
         d.text((52, 300 + 62 * i), k, font=font(SANS, 24), fill=MUTED)
         d.text((380, 298 + 62 * i), v, font=font(MONOB, 26), fill=BLUE)
@@ -388,13 +388,13 @@ def main():
         ("s02_problem", s_problem),
         ("s03_overview", s_overview),
         ("s04_build", step_scene("Step 1", "Build the server image (once)",
-                                 [("make docker", ["…", "#13 DONE 6.8s"]),
-                                  ("docker images vla-serve", txt("images.txt"))], pace=1.6)),
+                                 [("make docker", ["…", "#14 DONE 21.8s"]),
+                                  ("docker images vlaserve", txt("images.txt"))], pace=1.6)),
         ("s05_inspect", step_scene("Step 2", "Look at a checkpoint before loading it",
-                                   [("vla-serve inspect $CKPT", json_lines("inspect.json"))], pace=2.0)),
+                                   [("vlaserve inspect $CKPT", json_lines("inspect.json"))], pace=2.0)),
         ("s06_check", step_scene("Step 3", "Check the robot matches the policy",
-                                 [("vla-serve check $CKPT --profile kaair", txt("check_ok.txt")),
-                                  ("vla-serve check $CKPT --profile libero", txt("check_bad.txt"))], pace=2.2)),
+                                 [("vlaserve check $CKPT --profile kaair", txt("check_ok.txt")),
+                                  ("vlaserve check $CKPT --profile libero", txt("check_bad.txt"))], pace=2.2)),
         ("s07_serve", step_scene("Step 4", "Start the server",
                                  [("make docker-run GPU=3 CKPT_ROOT=/mnt/nas/…/checkpoints MODEL=$CKPT",
                                    txt("serverlog.txt")[-2:]),

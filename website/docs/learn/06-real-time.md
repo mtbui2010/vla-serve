@@ -64,7 +64,7 @@ after a slow warm-up; the end-to-end test caught it.
     **0 stalls**, 6 chunks, 38 stale actions dropped (≈ 7–8 per chunk ≈ 0.24 s round trip × 30 Hz).
 
 !!! code "Where in the code"
-    [`client.py`](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/client.py):
+    [`client.py`](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/client.py):
     `ActionQueue.on_chunk` (pure logic, unit-tested without clocks) and `ChunkExecutor.run`
     (two threads: the fixed-rate control loop and the inference requester).
 

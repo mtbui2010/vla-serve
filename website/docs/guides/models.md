@@ -3,9 +3,9 @@
 ## Three ways to name a model
 
 ```bash
-vla-serve serve lerobot/pi05_libero_finetuned          # Hugging Face repo id (through the HF cache)
-vla-serve serve /data/runs/x/checkpoints/last/pretrained_model   # local directory
-vla-serve serve pi05-libero                            # alias from a registry file
+vlaserve serve lerobot/pi05_libero_finetuned          # Hugging Face repo id (through the HF cache)
+vlaserve serve /data/runs/x/checkpoints/last/pretrained_model   # local directory
+vlaserve serve pi05-libero                            # alias from a registry file
 ```
 
 Anything in LeRobot's checkpoint format works without registration. An alias only adds a short
@@ -13,7 +13,7 @@ name, a pinned revision and a licence.
 
 ## Your own aliases
 
-```yaml title="~/.config/vla-serve/models.yaml"
+```yaml title="~/.config/vlaserve/models.yaml"
 models:
   kaair-drawer:
     source: /ckpt/smolvla_open_drawer_500_20260924/checkpoints/020000/pretrained_model
@@ -25,12 +25,12 @@ models:
 ```
 
 Your file overrides the bundled one. In a container, mount it:
-`-v ~/.config/vla-serve:/root/.config/vla-serve:ro` (`make docker-run` does this automatically if
+`-v ~/.config/vlaserve:/root/.config/vlaserve:ro` (`make docker-run` does this automatically if
 the directory exists).
 
 ## Licences: recorded, warned, never blocked
 
-Model weights carry their own licence, independent of the code that runs them. vla-serve reports
+Model weights carry their own licence, independent of the code that runs them. vlaserve reports
 one for every model, from — in order — your registry entry, the checkpoint's config, or what it
 can infer:
 
@@ -47,6 +47,6 @@ on. That is not Apache, MIT or BSD. It does not stop you using pi0.5 in the lab;
 you ship a product. (Gemma 4 moved to Apache-2.0; PaliGemma-based policies today are on the older
 terms.)
 
-vla-serve does not block anything, by design: it serves your own lab's checkpoints, and the goal
+vlaserve does not block anything, by design: it serves your own lab's checkpoints, and the goal
 is that whoever ships a robot knows what they ship. Its sibling VisionServe takes the opposite,
 stricter line for a different reason; see its documentation.

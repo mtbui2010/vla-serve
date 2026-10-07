@@ -30,7 +30,7 @@ change the outcome: what you measure is the served policy alone.
 
 ## Worked example: kaair_sim, open the drawer
 
-[`examples/kaair_sim_eval.py`](https://github.com/mtbui2010/vla-serve/blob/main/examples/kaair_sim_eval.py)
+[`examples/kaair_sim_eval.py`](https://github.com/mtbui2010/vlaserve/blob/main/examples/kaair_sim_eval.py)
 does exactly this for a MuJoCo kitchen-cabinet task with a SmolVLA policy.
 
 ```bash
@@ -54,10 +54,10 @@ compare with an in-process run on CPU, device for device.
 
     | run | drawers opened |
     |---|---|
-    | vla-serve, policy on **CPU** | **42 / 50** |
+    | vlaserve, policy on **CPU** | **42 / 50** |
     | in-process LeRobot, policy on **CPU** | **42 / 50** |
-    | vla-serve, policy on GPU | 36 / 50 |
-    | vla-serve, CPU, **client resize + JPEG q95 4:4:4** (the client default) | **44 / 50** |
+    | vlaserve, policy on GPU | 36 / 50 |
+    | vlaserve, CPU, **client resize + JPEG q95 4:4:4** (the client default) | **44 / 50** |
 
     On the same device the two are indistinguishable: 3 scenes only one of them solved, 3 only
     the other (paired test p = 1.0), and the same five hard scenes failed in both. The GPU run is
@@ -65,7 +65,7 @@ compare with an in-process run on CPU, device for device.
     and CPU chunks differ by at most 0.018 rad, while a different noise draw moves them by up to
     0.48 rad, so which noise each episode happens to draw dominates.
 
-    **Plain scene** (single-drawer SmolVLA): 47/50 through vla-serve (GPU) vs 49/50 in-process
+    **Plain scene** (single-drawer SmolVLA): 47/50 through vlaserve (GPU) vs 49/50 in-process
     (CPU), p = 0.62. Its hardest scene (seed 4) failed 5/5 in-process when re-run alone.
 
 ## Read results honestly

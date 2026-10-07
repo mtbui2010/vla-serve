@@ -1,4 +1,4 @@
-# CLAUDE.md — vla-serve rules
+# CLAUDE.md — vlaserve rules
 
 Read before changing code. Sibling of `../vision_serve` (Go, CV models); this one serves
 Vision-Language-Action policies and is deliberately **Python**.
@@ -7,8 +7,8 @@ Vision-Language-Action policies and is deliberately **Python**.
 
 One command to serve a trained VLA policy locally and drive a robot with it:
 
-    vla-serve serve pi05-libero        # HTTP server, chunk-returning API
-    vla-serve check MODEL --profile P  # robot vs policy, before anything moves
+    vlaserve serve pi05-libero        # HTTP server, chunk-returning API
+    vlaserve check MODEL --profile P  # robot vs policy, before anything moves
 
 Goal: easy to use and general across future models. Not a research artefact; novelty is not a goal.
 

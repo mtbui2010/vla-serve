@@ -131,7 +131,7 @@ def _parse_observation(body: dict, spec: PolicySpec) -> tuple[Observation, int |
 
 
 def create_app(manager: ModelManager) -> FastAPI:
-    app = FastAPI(title="vla-serve")
+    app = FastAPI(title="vlaserve")
 
     # Registered on VLAServeError, not Exception: Starlette treats an `Exception` handler as the
     # 500 handler and re-raises after it, so caller mistakes would surface as server errors.

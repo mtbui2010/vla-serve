@@ -1,14 +1,14 @@
-"""Closed-loop test of a vla-serve server on kaair_sim's MuJoCo "open drawer" task.
+"""Closed-loop test of a vlaserve server on kaair_sim's MuJoCo "open drawer" task.
 
 Reuses kaair_sim's own evaluation (`/sim/scripts/eval_policy.py`: scenes, seeds, success
 criterion, results file) unchanged, and swaps only the policy: instead of loading LeRobot in
-process, every chunk comes from the vla-serve HTTP server. Run inside the kaair_sim container:
+process, every chunk comes from the vlaserve HTTP server. Run inside the kaair_sim container:
 
     # host: server in its container, checkpoint dir mounted read-only
     docker run -d --gpus '"device=3"' -p 127.0.0.1:11450:11450 \
       -v ~/.cache/huggingface:/root/.cache/huggingface \
       -v /mnt/nas/lerobot_shared/kaair_sim/checkpoints:/ckpt:ro \
-      --name vla-serve-kaair vla-serve:gpu-cu128 serve --host 0.0.0.0 \
+      --name vlaserve-kaair vlaserve:gpu-cu128 serve --host 0.0.0.0 \
       /ckpt/smolvla_open_drawer_500_20260924/checkpoints/020000/pretrained_model
 
     # kaair_sim_humble (network=host), client package copied to /tmp/vlaclient
@@ -99,7 +99,7 @@ def main():
     t0 = time.time()
     eval_policy.main()
     rt = np.array(served.roundtrip_ms)
-    print(f"vla-serve: {served.calls} chunk requests, round trip median {np.median(rt):.1f} ms, "
+    print(f"vlaserve: {served.calls} chunk requests, round trip median {np.median(rt):.1f} ms, "
           f"p95 {np.percentile(rt, 95):.1f} ms, wall {time.time() - t0:.0f} s")
 
 

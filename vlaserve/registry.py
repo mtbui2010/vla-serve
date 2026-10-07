@@ -2,7 +2,7 @@
 
 A name is resolved, in order, as:
   1. an alias in the registry (the bundled `registry/models.yaml`, then the user's
-     `~/.config/vla-serve/models.yaml`, which wins on conflict);
+     `~/.config/vlaserve/models.yaml`, which wins on conflict);
   2. a local directory containing a LeRobot `config.json`;
   3. a Hugging Face repo id (`org/name`), fetched through the normal HF cache, so
      `HF_HOME` / `HF_HUB_OFFLINE` behave exactly as they do for LeRobot itself.
@@ -25,7 +25,7 @@ from .errors import ModelNotFound
 from .licenses import LicenseInfo, resolve as resolve_license
 
 USER_REGISTRY = Path(os.environ.get("VLASERVE_REGISTRY",
-                                    Path.home() / ".config" / "vla-serve" / "models.yaml"))
+                                    Path.home() / ".config" / "vlaserve" / "models.yaml"))
 
 
 @dataclass

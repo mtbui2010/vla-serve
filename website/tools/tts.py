@@ -30,7 +30,7 @@ from kokoro import KPipeline       # noqa: E402
 
 SR = 24000
 GAP = 0.15                          # silence between sentences [s]
-SUBTITLE = {"v l a serve": "vla-serve", "K A A I R": "kaair", "Lee-bear-oh": "LIBERO",
+SUBTITLE = {"v l a serve": "vlaserve", "K A A I R": "kaair", "Lee-bear-oh": "LIBERO",
             "p s": "ps", "vision language action": "vision-language-action"}
 
 

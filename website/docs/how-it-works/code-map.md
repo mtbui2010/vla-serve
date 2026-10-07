@@ -16,7 +16,7 @@ observation against the spec.
 | `PolicySpec.validate(images, state, task)` | refuse a bad observation with a reason |
 | `safetensors_shapes(path)` | tensor shapes from a `.safetensors` header, no data read |
 
-[Source](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/spec.py) · tests: `tests/test_spec_codec_license.py`
+[Source](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/spec.py) · tests: `tests/test_spec_codec_license.py`
 
 ## `registry.py` and `licenses.py` — names and licences
 
@@ -24,7 +24,7 @@ observation against the spec.
 plus a `LicenseInfo`. Licences come from the registry entry, then the checkpoint, then the
 backbone (PaliGemma → `gemma-terms`).
 
-[registry.py](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/registry.py) · [licenses.py](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/licenses.py) ·
+[registry.py](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/registry.py) · [licenses.py](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/licenses.py) ·
 bundled aliases: `vlaserve/data/models.yaml`
 
 ## `compat.py` — old checkpoints
@@ -32,7 +32,7 @@ bundled aliases: `vlaserve/data/models.yaml`
 Registers processor-step names that newer LeRobot versions renamed, as subclasses of their
 replacements. Today: `delta_actions_processor` → `relative_actions_processor`.
 
-[Source](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/compat.py) · tests: `tests/test_compat.py`
+[Source](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/compat.py) · tests: `tests/test_compat.py`
 
 ## `backends/` — running the policy
 
@@ -40,8 +40,8 @@ replacements. Today: `delta_actions_processor` → `relative_actions_processor`.
 `LeRobotBackend` implements it: frames to tensors (no resize), LeRobot preprocessor,
 `predict_action_chunk`, postprocessor per step. Eager PyTorch unless `compile: true`.
 
-[base.py](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/backends/base.py) ·
-[lerobot_backend.py](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/backends/lerobot_backend.py) ·
+[base.py](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/backends/base.py) ·
+[lerobot_backend.py](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/backends/lerobot_backend.py) ·
 tests: `tests/test_gpu_parity.py` (opt-in, `-m gpu`)
 
 ## `codec.py` — the wire format
@@ -49,7 +49,7 @@ tests: `tests/test_gpu_parity.py` (opt-in, `-m gpu`)
 msgpack with numpy arrays as `{dtype, shape, bytes}`. Every header is checked before memory is
 allocated; bodies over 64 MB are refused.
 
-[Source](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/codec.py)
+[Source](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/codec.py)
 
 ## `server.py` — HTTP
 
@@ -57,7 +57,7 @@ FastAPI app plus `ModelManager` (load / unload / per-model lock). Caller mistake
 errors mapped to 4xx; inference runs in a worker thread so `/health` stays responsive; no GPU
 work starts for a client that has disconnected.
 
-[Source](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/server.py) · tests: `tests/test_server_client.py` · API:
+[Source](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/server.py) · tests: `tests/test_server_client.py` · API:
 [reference](../reference/api.md)
 
 ## `client.py` — the robot side
@@ -69,7 +69,7 @@ work starts for a client that has disconnected.
 | `ChunkExecutor` | fixed-rate control loop + background inference requests |
 | `RunStats` | stalls, startup ticks, stale actions dropped, round-trip times |
 
-[Source](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/client.py) · tests: `tests/test_server_client.py`,
+[Source](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/client.py) · tests: `tests/test_server_client.py`,
 `tests/test_client_is_light.py` (client must import without torch)
 
 ## `profiles.py` — the robot
@@ -77,14 +77,14 @@ work starts for a client that has disconnected.
 `RobotProfile` (fps, camera name mapping, state/action size, joint names) and `check(spec)`,
 which lists every mismatch. Bundled profiles: `vlaserve/data/profiles/`.
 
-[Source](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/profiles.py) · tests: `tests/test_profiles.py`
+[Source](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/profiles.py) · tests: `tests/test_profiles.py`
 
 ## `cli.py` — the command line
 
 `list`, `inspect`, `check`, `serve`, `bench`. `serve` and `bench` print an install hint if the
 server dependencies are missing.
 
-[Source](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/cli.py) · [reference](../reference/cli.md)
+[Source](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/cli.py) · [reference](../reference/cli.md)
 
 ## Outside the package
 

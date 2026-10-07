@@ -1,9 +1,9 @@
-# vla-serve GPU server image, x86-64.
+# vlaserve GPU server image, x86-64.
 #
-#   docker build -f deploy/Dockerfile -t vla-serve:gpu-cu128 .
+#   docker build -f deploy/Dockerfile -t vlaserve:gpu-cu128 .
 #   docker run -d --gpus all -p 11450:11450 \
 #       -v ~/.cache/huggingface:/root/.cache/huggingface \
-#       --name vla-serve vla-serve:gpu-cu128 serve --host 0.0.0.0 pi05-libero
+#       --name vlaserve vlaserve:gpu-cu128 serve --host 0.0.0.0 pi05-libero
 #
 # No weights in the image: checkpoints come from the mounted HF cache or a mounted directory.
 #
@@ -33,14 +33,14 @@ RUN pip install torch==${TORCH_VERSION} torchvision==${TORCHVISION_VERSION} \
         --index-url https://download.pytorch.org/whl/${TORCH_CUDA} \
  && printf 'torch==%s\ntorchvision==%s\n' ${TORCH_VERSION} ${TORCHVISION_VERSION} > /etc/pip-constraints.txt
 
-WORKDIR /opt/vla-serve
+WORKDIR /opt/vlaserve
 COPY pyproject.toml README.md ./
 COPY vlaserve ./vlaserve
 COPY tests ./tests
 RUN pip install -c /etc/pip-constraints.txt ".[server,test]" \
  && python -c "import torch; assert torch.__version__.startswith('${TORCH_VERSION}'), torch.__version__" \
  && python -c "import lerobot.policies.pi05, lerobot.policies.smolvla, vlaserve.server" \
- && vla-serve list > /dev/null
+ && vlaserve list > /dev/null
 
 VOLUME ["/root/.cache/huggingface"]
 EXPOSE 11450
@@ -49,5 +49,5 @@ EXPOSE 11450
 HEALTHCHECK --interval=30s --timeout=5s --start-period=600s --retries=3 \
     CMD python -c "import urllib.request,sys; urllib.request.urlopen('http://127.0.0.1:11450/health', timeout=4)" || exit 1
 
-ENTRYPOINT ["vla-serve"]
+ENTRYPOINT ["vlaserve"]
 CMD ["serve", "--host", "0.0.0.0"]

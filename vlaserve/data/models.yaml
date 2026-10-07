@@ -4,7 +4,7 @@
 # `license` is what we know about the WEIGHTS. Leave it out rather than guess: an unknown licence
 # is reported as unknown, and PaliGemma-based policies are detected from their config.
 #
-# Add your own in ~/.config/vla-serve/models.yaml (same format; it overrides these).
+# Add your own in ~/.config/vlaserve/models.yaml (same format; it overrides these).
 
 models:
   pi05-libero:

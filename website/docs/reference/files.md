@@ -2,7 +2,7 @@
 
 ## Registry — `models.yaml`
 
-Bundled: `vlaserve/data/models.yaml`. Yours: `~/.config/vla-serve/models.yaml` (or
+Bundled: `vlaserve/data/models.yaml`. Yours: `~/.config/vlaserve/models.yaml` (or
 `$VLASERVE_REGISTRY`), which overrides bundled entries of the same name.
 
 ```yaml
@@ -35,4 +35,4 @@ action_names: [joint1, ...]     # optional; if both sides list them, order is ch
 notes: free text
 ```
 
-`vla-serve check MODEL --profile kaair.yaml` compares the two and lists every disagreement.
+`vlaserve check MODEL --profile kaair.yaml` compares the two and lists every disagreement.

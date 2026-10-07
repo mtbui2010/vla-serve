@@ -1,6 +1,6 @@
 """What a policy consumes and produces, read from checkpoint metadata without loading weights.
 
-Reading the spec never imports torch, so `vla-serve inspect` is instant even for an 8 GB
+Reading the spec never imports torch, so `vlaserve inspect` is instant even for an 8 GB
 checkpoint on a network drive, and works in the client-only install.
 
 Where the truth lives. `config.json`'s `input_features` can be stale: a policy fine-tuned from

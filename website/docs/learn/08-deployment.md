@@ -38,7 +38,7 @@ configuration, batch 1 — treat as indicative):
 
 On Orin-class hardware a large VLA only works with asynchronous execution
 ([chapter 6](06-real-time.md)) and long chunks; Thor-class hardware is fast enough to keep a
-30 Hz robot comfortably fed. vla-serve's image is x86-64 only for now.
+30 Hz robot comfortably fed. vlaserve's image is x86-64 only for now.
 
 ## Exporting to ONNX / TensorRT
 
@@ -53,8 +53,8 @@ means:
 3. **Keep the pre/postprocessing outside**: tokenizer, normalisation statistics, relative
    actions. Those must be re-implemented around the graph, per checkpoint.
 
-vla-serve keeps a backend interface for this
-([`backends/base.py`](https://github.com/mtbui2010/vla-serve/blob/main/vlaserve/backends/base.py))
+vlaserve keeps a backend interface for this
+([`backends/base.py`](https://github.com/mtbui2010/vlaserve/blob/main/vlaserve/backends/base.py))
 but has no ONNX backend yet: any export must pass the parity tests **and** a closed-loop check
 before it replaces PyTorch.
 
@@ -63,12 +63,12 @@ before it replaces PyTorch.
 The weights' licence comes from the backbone. pi0 / pi0.5 / pi0-FAST build on PaliGemma and
 fall under the [Gemma Terms of Use](https://ai.google.dev/gemma/terms): usable in research,
 but whoever redistributes a fine-tune must pass the use restrictions on. Check every model card
-before shipping; `vla-serve inspect` reports what it can infer.
+before shipping; `vlaserve inspect` reports what it can infer.
 
 ## Checklist
 
 - [ ] torch's CUDA build ≤ the driver's CUDA (`torch.cuda.is_available()` is `True`)
-- [ ] `vla-serve check` passes for the exact robot profile
+- [ ] `vlaserve check` passes for the exact robot profile
 - [ ] round-trip latency × fps < `refill_at`; `stalls == 0` in a dry run
 - [ ] closed-loop success measured with seeded noise, counts + interval reported
 - [ ] the robot's own velocity / workspace limits and an emergency stop are active

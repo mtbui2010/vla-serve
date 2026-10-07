@@ -1,11 +1,11 @@
-site_name: vla-serve
+site_name: vlaserve
 site_description: Serve trained Vision-Language-Action robot policies locally with one command, and learn how VLAs work along the way.
 # Assumed repository location (same account as VisionServe). Change both lines if it lives elsewhere.
-site_url: https://mtbui2010.github.io/vla-serve/
-repo_url: https://github.com/mtbui2010/vla-serve
-repo_name: mtbui2010/vla-serve
+site_url: https://mtbui2010.github.io/vlaserve/
+repo_url: https://github.com/mtbui2010/vlaserve
+repo_name: mtbui2010/vlaserve
 edit_uri: edit/main/website/docs/
-copyright: vla-serve is Apache-2.0. Model weights carry their own licences (see each model).
+copyright: vlaserve is Apache-2.0. Model weights carry their own licences (see each model).
 
 theme:
   name: material

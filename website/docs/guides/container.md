@@ -7,7 +7,7 @@ Docker and an NVIDIA driver.
 ## Build
 
 ```bash
-make docker                          # → vla-serve:gpu-cu128
+make docker                          # → vlaserve:gpu-cu128
 make docker TORCH_CUDA=cu126         # host driver older than 570
 make docker-test                     # fast tests inside the image
 ```
@@ -25,10 +25,10 @@ make docker-run MODEL=<name or path> [GPU=3] [CKPT_ROOT=/host/checkpoints] [PORT
 which runs, for example:
 
 ```bash
-docker run -d --name vla-serve --gpus '"device=3"' -p 127.0.0.1:11450:11450 \
+docker run -d --name vlaserve --gpus '"device=3"' -p 127.0.0.1:11450:11450 \
   -v ~/.cache/huggingface:/root/.cache/huggingface \
   -v /mnt/nas/lerobot_shared/kaair_sim/checkpoints:/ckpt:ro \
-  vla-serve:gpu-cu128 serve --host 0.0.0.0 \
+  vlaserve:gpu-cu128 serve --host 0.0.0.0 \
   /ckpt/smolvla_open_drawer_500_20260924/checkpoints/020000/pretrained_model
 ```
 
@@ -58,7 +58,7 @@ minutes.
 make load  MODEL=lerobot/pi05_libero_finetuned
 make rm    MODEL=lerobot/pi05_libero_finetuned
 make reset MODEL=...                       # start of a new episode
-make docker-shell                          # then: vla-serve inspect /ckpt/...
+make docker-shell                          # then: vlaserve inspect /ckpt/...
 make docker-stop
 ```
 
@@ -67,8 +67,8 @@ make docker-stop
 No registry is published yet. Copy the image by hand:
 
 ```bash
-make docker-save                           # → vla-serve-gpu-cu128.tar.gz
-docker load < vla-serve-gpu-cu128.tar.gz   # on the other machine
+make docker-save                           # → vlaserve-gpu-cu128.tar.gz
+docker load < vlaserve-gpu-cu128.tar.gz   # on the other machine
 ```
 
 ## Verify an image end to end

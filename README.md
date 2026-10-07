@@ -1,11 +1,11 @@
-# vla-serve
+# vlaserve
 
 Serve a trained Vision-Language-Action policy locally with one command, and drive a robot with it.
 
 ```bash
-vla-serve inspect keti-pi05-openarm-handover        # cameras, state/action, chunk, licence — no GPU
-vla-serve check   keti-pi05-openarm-handover --profile openarm-bimanual
-vla-serve serve   keti-pi05-openarm-handover        # http://127.0.0.1:11450
+vlaserve inspect keti-pi05-openarm-handover        # cameras, state/action, chunk, licence — no GPU
+vlaserve check   keti-pi05-openarm-handover --profile openarm-bimanual
+vlaserve serve   keti-pi05-openarm-handover        # http://127.0.0.1:11450
 ```
 
 ```python
@@ -25,11 +25,11 @@ in Python, because for VLAs generality matters more than a single static binary
 
 ## What it handles for you
 
-| Problem when deploying a VLA | What vla-serve does |
+| Problem when deploying a VLA | What vlaserve does |
 |---|---|
 | Every policy has its own loading code, tokenizer and normalisation stats | Loads LeRobot-format checkpoints from their own `config.json` + processor files, through LeRobot's factories, so any policy LeRobot implements is in reach. No manifest to write. **Verified so far: pi0.5** (two checkpoints, bit-exact vs LeRobot) and **SmolVLA** (kaair_sim open-drawer, bit-exact vs in-process and closed-loop in MuJoCo). Others (GR00T, X-VLA, ACT, ...) go through the same code path but are untested, and some need their LeRobot extra installed (`lerobot[groot]`, ...). |
 | A checkpoint saved by an older LeRobot no longer loads | `compat.py` aliases renamed processor steps without touching the files (e.g. KETI's pi0.5 OpenArm checkpoints, saved with 0.5.x). |
-| The robot's cameras / joints don't match what the policy was trained on, and nothing errors | `vla-serve check` compares a **robot profile** with the policy: camera names, state/action size, joint order. |
+| The robot's cameras / joints don't match what the policy was trained on, and nothing errors | `vlaserve check` compares a **robot profile** with the policy: camera names, state/action size, joint order. |
 | Inference is slower than one control period | `ChunkExecutor` runs the robot at a fixed rate, requests the next chunk early, and drops actions that went stale during inference. |
 | Is my serving path the same as LeRobot's? | GPU parity test against LeRobot's own policy server, same seed. |
 | What licence am I shipping? | Every model reports one; PaliGemma derivatives are detected as `gemma-terms` and warned about. Nothing is blocked. |
@@ -47,13 +47,13 @@ first, then `pip install -e '.[test]'`.
 
 ## Models
 
-`vla-serve list` shows aliases (`vlaserve/data/models.yaml`, plus your own in
-`~/.config/vla-serve/models.yaml`). Any LeRobot checkpoint also works directly by HF repo id or
+`vlaserve list` shows aliases (`vlaserve/data/models.yaml`, plus your own in
+`~/.config/vlaserve/models.yaml`). Any LeRobot checkpoint also works directly by HF repo id or
 local path:
 
 ```bash
-vla-serve serve /data/checkpoints/my_run/pretrained_model
-vla-serve serve lerobot/pi05_libero_finetuned
+vlaserve serve /data/checkpoints/my_run/pretrained_model
+vlaserve serve lerobot/pi05_libero_finetuned
 ```
 
 ## HTTP API
